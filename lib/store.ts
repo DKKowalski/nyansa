@@ -25,9 +25,13 @@ interface Profile {
 interface Session {
   pans: Record<number, number>; // practice set answers
   psetDone: boolean;
+  /** Increments on every new practice attempt; the question screen is keyed by it. */
+  pattempt: number;
   mans: Record<number, number>; // mock answers
   mflag: number[];
   mockEndsAt: number | null; // the mock timer keeps running if the student leaves
+  /** Increments on every new mock attempt; the exam screen is keyed by it (submitting must not change it). */
+  mattempt: number;
   tq: number; // tutor context: index into PQ, -1 = none
   chat: ChatMsg[] | null;
   /** Clock for date maths, set when saved progress loads. Null during prerender so server and client HTML match. */
@@ -40,6 +44,7 @@ interface Actions {
   startChat: (qi: number) => void;
   pushChat: (...m: ChatMsg[]) => void;
   startMock: () => void;
+  startPractice: () => void;
   reset: () => void;
 }
 
@@ -47,7 +52,7 @@ const profile0: Profile = {
   phone: "", name: "", role: "student", exam: null, cls: null, subjects: null, date: "",
   minutes: 30, saveData: true, mood: null, answers: {}, onboarded: false,
 };
-const session0: Session = { pans: {}, psetDone: false, mans: {}, mflag: [], mockEndsAt: null, tq: -1, chat: null, now: null };
+const session0: Session = { pans: {}, psetDone: false, pattempt: 0, mans: {}, mflag: [], mockEndsAt: null, mattempt: 0, tq: -1, chat: null, now: null };
 
 export const MOCK_SECONDS = 9000;
 
@@ -69,7 +74,8 @@ export const useApp = create<Profile & Session & Actions>()(
             : [{ ai: `Hey ${firstName(get().name)}! New day, new topics. What are you stuck on today?` }],
         }),
       pushChat: (...m) => set({ chat: [...(get().chat ?? []), ...m] }),
-      startMock: () => set({ mans: {}, mflag: [], mockEndsAt: Date.now() + MOCK_SECONDS * 1000 }),
+      startPractice: () => set({ pans: {}, pattempt: get().pattempt + 1 }),
+      startMock: () => set({ mans: {}, mflag: [], mockEndsAt: Date.now() + MOCK_SECONDS * 1000, mattempt: get().mattempt + 1 }),
       reset: () => set({ ...profile0, ...session0, now: get().now }),
     }),
     {
@@ -109,6 +115,13 @@ export function strandScores(answers: Record<number, number>): Record<string, nu
   STRANDS.forEach(({ name }) => (sc[name] = n[name] ? sc[name] / n[name] : 0));
   return sc;
 }
+/** Linear equations mastery before Set 2, and after it for a given score out of 5 (sample rule until the
+ *  adaptive engine exists: 1 or fewer right leaves it unchanged, each extra right answer adds 7 points). */
+export const MASTERY_BEFORE = 42;
+export const masteryAfterSet = (correct: number) => Math.max(MASTERY_BEFORE, MASTERY_BEFORE + (correct - 1) * 7);
+/** Ticks lit on a 30-tick mastery bar. */
+export const masteryTicks = (pct: number) => Math.round((pct / 100) * 30);
+
 export const weakest = (sc: Record<string, number>) => STRANDS.map((x) => x.name).sort((a, b) => sc[a] - sc[b]);
 
 export function greeting(now: number | null) {

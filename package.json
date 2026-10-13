@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "start:e2e": "next start -H 127.0.0.1 -p 3124",
+    "e2e": "e2e run"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.2",
@@ -18,9 +20,13 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@ai-sdk/openai": "^4.0.91",
+    "@e2e-dev/web": "^0.14.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "ai": "^7.0.135",
+    "e2e": "^0.19.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "typescript": "^5"

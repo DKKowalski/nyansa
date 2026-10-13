@@ -545,3 +545,4 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outl
 .chatfoot .helps { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -14px; padding-inline: 14px; }
 .chatfoot .helps button { flex: none; }
 @container (min-width: 900px) { .chatfoot .helps { flex-wrap: wrap; margin-inline: 0; padding-inline: 0; } }
+.hero :is(a, button).restart { background: transparent; color: #BFD9CB; padding: 6px; font-size: 15px; font-weight: 400; text-decoration: underline; text-underline-offset: 3px; }

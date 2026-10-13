@@ -5,7 +5,7 @@ import { Deco, I } from "@/components/icons";
 import { BackLink } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { Ticks } from "@/components/viz";
-import { useApp } from "@/lib/store";
+import { MASTERY_BEFORE, masteryTicks, useApp } from "@/lib/store";
 
 /** L3 Topic: what it covers, exam frequency, mastery, and Learn / Practise / Past questions / Tutor. */
 export default function Topic() {
@@ -31,7 +31,7 @@ export default function Topic() {
           </div>
           <div className="mast">
             <div className="hd"><span className="ic"><I.check /></span><b>Your mastery</b><span className="small" style={{ color: "var(--ink)" }}>Familiar · 42%</span></div>
-            <Ticks n={30} on={12} now={12} label="Mastery 42%" />
+            <Ticks n={30} on={masteryTicks(MASTERY_BEFORE)} now={masteryTicks(MASTERY_BEFORE)} label={`Mastery ${MASTERY_BEFORE}%`} />
             <span className="small">Proficient at 70%. About 2 more practice sets.</span>
           </div>
         </div>

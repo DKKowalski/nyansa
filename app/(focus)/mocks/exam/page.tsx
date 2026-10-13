@@ -25,7 +25,14 @@ function Legend() {
 }
 
 /** M2 Mock exam: hideable timer, flag for review, question grid, answers autosaved on the device. */
-export default function MockExam() {
+/** Next keeps recent routes mounted (React Activity), which would carry the question position into a new
+ *  attempt. Keying on the attempt starts each one fresh while "continue" keeps its place. */
+export default function MockExamPage() {
+  const attempt = useApp((s) => s.mattempt);
+  return <MockExam key={attempt} />;
+}
+
+function MockExam() {
   const router = useRouter();
   const toast = useToast();
   const { mans, mflag, mockEndsAt, set, startMock } = useApp();
@@ -40,17 +47,19 @@ export default function MockExam() {
   // Opened directly (not from M1): start a fresh paper. Mount-only, so submitting never restarts it.
   useEffect(() => { if (!useApp.getState().mockEndsAt) startMock(); }, [startMock]);
   const t = tick ?? clock;
-  const left = mockEndsAt && t ? Math.max(0, Math.round((mockEndsAt - t) / 1000)) : MOCK_SECONDS;
+  // The store clock is from app load, so it can be stale on the first frame: never show more than the exam length.
+  const left = mockEndsAt && t ? Math.min(MOCK_SECONDS, Math.max(0, Math.round((mockEndsAt - t) / 1000))) : MOCK_SECONDS;
 
   const submit = () => { setGrid(false); set({ mockEndsAt: null }); router.push("/mocks/results"); };
   const timeUp = useEffectEvent(() => { toast("Time is up. Your paper was submitted."); submit(); });
   useEffect(() => {
+    const first = requestAnimationFrame(() => setTick(Date.now())); // fresh reading right away, not after 1s
     const t = setInterval(() => {
       const end = useApp.getState().mockEndsAt;
       setTick(Date.now());
       if (end && Date.now() >= end) timeUp();
     }, 1000);
-    return () => clearInterval(t);
+    return () => { cancelAnimationFrame(first); clearInterval(t); };
   }, []);
 
   const n = MQ.length, q = MQ[mi], a = mans[mi], flagged = mflag.includes(mi);
@@ -88,6 +97,7 @@ export default function MockExam() {
               ? <button type="button" className="btn" onClick={submit}>Finish and submit</button>
               : <button type="button" className="btn" onClick={() => setMi(mi + 1)}>Next</button>}
           </div>
+          {mi < n - 1 && <button type="button" className="btn text m-only" onClick={submit}>Finish and submit now</button>}
         </div>
         <div className="col w-only">
           <div className="gcard"><b style={{ fontWeight: 500 }}>Questions</b><div style={{ marginTop: 10 }}>{qGrid}</div><div style={{ marginTop: 12 }}><Legend /></div></div>

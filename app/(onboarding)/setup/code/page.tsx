@@ -5,6 +5,7 @@ import { BusyButton, haptic } from "@/components/motion";
 import { SetupTop, SmsBox } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { useApp } from "@/lib/store";
+import { formatGhana } from "@/lib/phone";
 
 /** A2 Sign up: SMS code. Any 6 digits pass until the SMS gateway is connected. */
 export default function Code() {
@@ -37,7 +38,7 @@ export default function Code() {
         <div className="col">
           <p className="hello">Check your messages</p>
           <h1 className="h-xl">Enter the code</h1>
-          <p className="lead">Sent to +233 {phone || "24 123 4567"}</p>
+          <p className="lead">Sent to +233 {phone ? formatGhana(phone) : "24 123 4567"}</p>
           <div className={`otp${ok ? " done" : ""}`}>
             {code.map((d, i) => (
               <input key={i} ref={(el) => { refs.current[i] = el; }} className="input" inputMode="numeric" autoComplete={i === 0 ? "one-time-code" : "off"}

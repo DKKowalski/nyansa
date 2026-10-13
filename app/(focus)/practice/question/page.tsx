@@ -9,7 +9,14 @@ import { PQ } from "@/lib/content";
 import { useApp } from "@/lib/store";
 
 /** P1 Practice question → P2 feedback: a green or red panel slides up with the explanation. */
-export default function PracticeQuestion() {
+/** Next keeps recent routes mounted (React Activity), which would carry the question position into a new
+ *  attempt. Keying on the attempt starts each one fresh while "continue" keeps its place. */
+export default function PracticeQuestionPage() {
+  const attempt = useApp((s) => s.pattempt);
+  return <PracticeQuestion key={attempt} />;
+}
+
+function PracticeQuestion() {
   const router = useRouter();
   const { pans, set, startChat } = useApp();
   const [pi, setPi] = useState(0);

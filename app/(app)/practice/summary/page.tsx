@@ -7,12 +7,13 @@ import { BackLink } from "@/components/shells";
 import { CtaLink } from "@/components/ui";
 import { Ticks } from "@/components/viz";
 import { PQ } from "@/lib/content";
-import { useApp } from "@/lib/store";
+import { MASTERY_BEFORE, masteryAfterSet, masteryTicks, useApp } from "@/lib/store";
 
 /** P3 Practice summary: score, mastery change and mistakes saved for review. */
 export default function Summary() {
   const pans = useApp((s) => s.pans);
-  const sc = PQ.filter((q, i) => pans[i] === q.a).length, up = sc >= 4;
+  const sc = PQ.filter((q, i) => pans[i] === q.a).length;
+  const after = masteryAfterSet(sc), up = after >= 70;
   useEffect(() => { const t = setTimeout(() => haptic("celebrate"), 250); return () => clearTimeout(t); }, []);
   return (
     <div className="scr">
@@ -29,8 +30,8 @@ export default function Summary() {
         <div className="col">
           <div className="mast">
             <div className="hd"><span className="ic"><I.up /></span><b>Linear equations</b><span className="small" style={{ color: "var(--ink)" }}>{up ? "Familiar → Proficient" : "Familiar"}</span></div>
-            <Ticks n={30} on={up ? 21 : 15} now={up ? 21 : 15} from={12} gain label={`Mastery ${up ? 70 : 50}%`} />
-            <span className="small">Mastery {up ? "42% → 70%" : "42% → 50%"}</span>
+            <Ticks n={30} on={masteryTicks(after)} now={masteryTicks(after)} from={masteryTicks(MASTERY_BEFORE)} gain label={`Mastery ${after}%`} />
+            <span className="small">{after > MASTERY_BEFORE ? `Mastery ${MASTERY_BEFORE}% → ${after}%` : `Mastery stays at ${MASTERY_BEFORE}%. Your mistakes are saved to review.`}</span>
           </div>
           <div className="sets">
             <span className="set done"><span className="bdg"><I.check /></span>Set 1</span>

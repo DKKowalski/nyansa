@@ -10,8 +10,8 @@ import { useApp } from "@/lib/store";
 export default function Sets() {
   const router = useRouter();
   const toast = useToast();
-  const { psetDone, set } = useApp();
-  const start = () => { set({ pans: {} }); router.push("/practice/question"); };
+  const { psetDone, startPractice } = useApp();
+  const start = () => { startPractice(); router.push("/practice/question"); };
   return (
     <div className="scr">
       <div className="top"><BackLink href="/learn/mathematics/linear-equations" /><div className="grow" /></div>

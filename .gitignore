@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# e2e (TesterArmy)
+.e2e/
+e2e.bugbash.config.ts
