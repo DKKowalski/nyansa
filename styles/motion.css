@@ -1,0 +1,267 @@
+/* Nyansa motion, after Emil Kowalski's animation rules (emilkowal.ski, animations.dev).
+   - Decide by frequency: everyday actions get fast, near-invisible feedback; rare moments (results,
+     a finished set, sign-up) get the delight.
+   - Only transform, opacity (and clip-path) animate, so low-end Android phones stay smooth.
+   - Enter with ease-out, move with ease-in-out, never ease-in; UI stays under 300ms.
+   - Mistakes never shake or buzz: wrong answers get a calm panel, wins get the celebration.
+   - Reduced motion keeps fades and colour changes, drops movement. */
+
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1); /* small overshoot, for playful wins only */
+  --d-press: 160ms;
+  --d-ui: 200ms;
+  --d-panel: 400ms;
+}
+
+/* ---------- 1. Press feedback: every pressable scales a touch on press (Feedback, tens/day) ---------- */
+:is(.btn, .cbtn, .chip, .seg .segitem, .mood, .ans button, .idk, .achip, .set, .node, .cal .d, .days :is(a, button),
+    .qgrid button, .enc button, .helps button, .suggest button, .mflag, .timer, .wnext, .hero :is(a, button), .tcard .go, .mic,
+    .nav .navitem, .side nav .navitem, .sec :is(a, button), .skip, .copy) {
+  transition: transform var(--d-press) var(--ease-out), background-color 150ms ease, color 150ms ease,
+    box-shadow 150ms ease, border-color 150ms ease, opacity 150ms ease;
+}
+:is(.pcard, .prow, .setrow) {
+  transition: transform var(--d-press) var(--ease-out), background-color 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+}
+:is(.btn, .cbtn, .chip, .seg .segitem, .ans button, .idk, .achip, .enc button, .helps button, .suggest button, .mflag, .timer,
+    .hero :is(a, button), .sec :is(a, button), .skip, .copy, .days :is(a, button)):not(:disabled):active { transform: scale(0.97); }
+:is(.pcard, .prow, .mood, .set, .setrow):not(:disabled):active { transform: scale(0.98); }
+:is(.cbtn, .wnext, .mic, .tcard .go, .node, .cal .d, .qgrid button, .nav .navitem):not(:disabled):active { transform: scale(0.94); }
+.node.cur:active { transform: scale(0.94); }
+
+/* Hover only where there is a real pointer: arrows nudge toward where they lead. */
+@media (hover: hover) and (pointer: fine) {
+  :is(.pcard, .prow, .tcard) :is(.go, .end) svg { transition: transform var(--d-ui) var(--ease-out); }
+  :is(.pcard, .prow):hover :is(.go, .end) svg, .suggest button:hover svg { transform: translateX(3px); }
+  .suggest button svg { transition: transform var(--d-ui) var(--ease-out); }
+  .suggest button:hover { background: #E6E8E3; }
+  .tcard:hover .go svg, .pcard:hover .go svg[data-up] { transform: translate(2px, -2px); }
+  .btn.light:hover { box-shadow: inset 0 0 0 1.5px #CCD0CA; }
+  .chip:not([aria-pressed="true"]):hover { border-color: rgba(20, 24, 22, .32); }
+  .side nav .navitem:hover { color: var(--ink); }
+}
+
+/* ---------- 2. Screens arrive, not appear (Preventing a jarring change, short stagger) ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+.scr > * { animation: rise 240ms var(--ease-out) both; }
+.scr > :nth-child(2) { animation-delay: 30ms; }
+.scr > :nth-child(3) { animation-delay: 60ms; }
+.scr > :nth-child(4) { animation-delay: 90ms; }
+.scr > :nth-child(5) { animation-delay: 120ms; }
+.scr > :nth-child(n + 6) { animation-delay: 150ms; }
+/* Swapped-in content slides instead (a keyframe would override the transition). */
+.scr > :is(.in, .in-next, .in-prev) { animation: none; }
+
+/* Content that swaps in place (next question, next lesson card, new day) slides the way you are going. */
+.in, .in-next, .in-prev { transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
+@starting-style {
+  .in { opacity: 0; transform: translateY(8px); }
+  .in-next { opacity: 0; transform: translateX(18px); }
+  .in-prev { opacity: 0; transform: translateX(-18px); }
+}
+
+/* Stagger a group the student sees occasionally (results lists, timelines). Never blocks taps. */
+.stagger > * { animation: rise 300ms var(--ease-out) both; }
+.stagger > :nth-child(2) { animation-delay: 50ms; }
+.stagger > :nth-child(3) { animation-delay: 100ms; }
+.stagger > :nth-child(4) { animation-delay: 150ms; }
+.stagger > :nth-child(5) { animation-delay: 200ms; }
+.stagger > :nth-child(n + 6) { animation-delay: 250ms; }
+
+/* ---------- 3. Selection: the choice answers back (State indication) ---------- */
+@keyframes pop { 0% { transform: scale(0.85); } 100% { transform: scale(1); } }
+.ans button[aria-pressed="true"] .l { animation: pop 260ms var(--ease-pop); }
+.ans .l { transition: background-color 150ms ease, color 150ms ease; }
+@keyframes bob { 0% { transform: translateY(0) rotate(0); } 35% { transform: translateY(-6px) rotate(-6deg); } 70% { transform: translateY(1px) rotate(3deg); } 100% { transform: none; } }
+.mood[aria-pressed="true"] .em { animation: bob 520ms var(--ease-out); display: inline-block; }
+.chip[aria-pressed="true"], .enc button[aria-pressed="true"] { animation: pop 220ms var(--ease-pop); }
+.mflag[aria-pressed="true"] { animation: pop 220ms var(--ease-pop); }
+
+/* Icon swaps (arrow → tick) morph with a blur instead of snapping. */
+:is([aria-pressed] .go, [aria-pressed] .end, .copy, .fb .ic) > * { transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out), filter 200ms var(--ease-out); }
+@starting-style {
+  :is([aria-pressed] .go, [aria-pressed] .end, .copy, .fb .ic) > * { opacity: 0; transform: scale(0.5); filter: blur(3px); }
+}
+
+/* Switch: thumb glides with the drawer curve and stretches while held, like iOS. */
+.sw { transition: background-color var(--d-ui) ease; }
+.sw::after { transition: transform 260ms var(--ease-drawer), width 160ms var(--ease-out); }
+.sw:active::after { width: 32px; }
+.sw[aria-checked="true"]:active::after { transform: translateX(16px); }
+
+/* Calendar and question grid: colour changes ease rather than flick. */
+.cal .d, .qgrid button { transition: transform var(--d-press) var(--ease-out), background-color 160ms ease, color 160ms ease; }
+
+/* Clip-path indicator (tab bar, side menu, segmented controls): an "active" copy of the row is revealed
+   under the selection, so background and label colour change together in one motion. */
+.clip { position: relative; }
+.clip > .clip-active { position: absolute; inset: 0; pointer-events: none; clip-path: inset(50% 50% 50% 50% round 999px);
+  display: inherit; grid-template-columns: inherit; grid-auto-flow: inherit; grid-auto-columns: inherit; gap: inherit; padding: inherit;
+  flex-direction: inherit; align-items: inherit; background: none; box-shadow: none; }
+.clip[data-ready] > .clip-active { transition: clip-path 260ms var(--ease-in-out); }
+
+/* ---------- 4. Progress you can feel ---------- */
+.ticks i { transition: background-color 200ms ease, height 200ms var(--ease-out); }
+@keyframes tick-on { 0% { opacity: .25; transform: scaleY(.6); } 60% { transform: scaleY(1.15); } 100% { opacity: 1; transform: none; } }
+.ticks i.lit { animation: tick-on 320ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 28ms + 250ms); }
+.ticks i.lit.gain { background: var(--gold); }
+
+@keyframes grow-x { from { transform: scaleX(0); } }
+.grow .bar i, .grow .mini i { transform-origin: left; animation: grow-x 700ms var(--ease-out) both; animation-delay: 250ms; }
+.grow > :nth-child(3) .bar i { animation-delay: 310ms; }
+.grow > :nth-child(4) .bar i { animation-delay: 370ms; }
+.grow > :nth-child(5) .bar i { animation-delay: 430ms; }
+.grow > :nth-child(n + 6) .bar i { animation-delay: 490ms; }
+@keyframes grow-y { from { transform: scaleY(0); } }
+.grow .pillbar i { transform-origin: bottom; animation: grow-y 600ms var(--ease-out) both; }
+.grow > div:nth-child(2) .pillbar i { animation-delay: 40ms; }
+.grow > div:nth-child(3) .pillbar i { animation-delay: 80ms; }
+.grow > div:nth-child(4) .pillbar i { animation-delay: 120ms; }
+.grow > div:nth-child(5) .pillbar i { animation-delay: 160ms; }
+.grow > div:nth-child(6) .pillbar i { animation-delay: 200ms; }
+.grow > div:nth-child(7) .pillbar i { animation-delay: 240ms; }
+
+/* Gauge ticks sweep on in order on result screens. */
+@keyframes sweep { from { opacity: 0; } }
+.gauge.sweep line.on { animation: sweep 240ms var(--ease-out) both; animation-delay: calc(var(--i) * 26ms + 150ms); }
+
+/* NumberFlow digits inherit the big-number styles. */
+number-flow-react { font-variant-numeric: tabular-nums; }
+
+/* ---------- 5. Answer feedback panel: slides up on the drawer curve (Spatial, Feedback) ---------- */
+.fb { transition: transform var(--d-panel) var(--ease-drawer), opacity 200ms ease; }
+@starting-style { .fb { transform: translateY(100%); } }
+@container (min-width: 900px) { @starting-style { .fb { transform: translate(-50%, 24px); opacity: 0; } } }
+.fb.ok .ic { animation: pop 420ms var(--ease-pop) 120ms both; }
+.fb.no .ic { animation: rise 240ms var(--ease-out) 120ms both; } /* calm: no shake, no bounce */
+
+/* ---------- 6. Sheets: drawer curve in, quick out, drag to dismiss (see Sheet in components/ui.tsx) ---------- */
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes sheet-in { from { transform: translateY(100%); } }
+@keyframes sheet-out { to { transform: translateY(100%); } }
+@keyframes modal-in { from { opacity: 0; transform: scale(0.96); } }
+@keyframes modal-out { to { opacity: 0; transform: scale(0.96); } }
+.sheet2[data-state="open"] { animation: fade-in var(--d-panel) var(--ease-out); }
+.sheet2[data-state="closed"] { animation: fade-out 200ms var(--ease-out) forwards; }
+.sheet2 > div { touch-action: none; }
+.sheet2[data-state="open"] > div { animation: sheet-in 500ms var(--ease-drawer); }
+.sheet2[data-state="closed"] > div { animation: sheet-out 200ms var(--ease-out) forwards; }
+.sheet2 > div[data-dragging] { transition: none; }
+.sheet2 > div[data-settling] { transition: transform 400ms var(--ease-drawer); }
+.grip { width: 44px; height: 5px; border-radius: 3px; background: #CFD2CC; margin: -6px auto 2px; }
+@container (min-width: 900px) {
+  .sheet2[data-state="open"] > div { animation: modal-in 250ms var(--ease-out); }
+  .sheet2[data-state="closed"] > div { animation: modal-out 180ms var(--ease-out) forwards; }
+  .grip { display: none; }
+}
+.sheet2:focus, .sheet2 > div:focus { outline: none; }
+
+/* ---------- 7. Busy buttons: label blurs into a spinner and back (State indication) ---------- */
+.btn > .btn-label { display: inline-flex; align-items: center; gap: 10px; transition: opacity 200ms ease, filter 200ms ease, transform 200ms var(--ease-out); }
+@starting-style { .btn > .btn-label { opacity: 0; filter: blur(2px); transform: scale(0.96); } }
+.btn[data-pending] { cursor: progress; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: spin 600ms linear infinite; }
+.btn[data-done] { background: var(--forest); }
+
+/* ---------- 8. Moments of delight (rare: first visit, results, a finished set) ---------- */
+/* Splash: the mark settles in, then the words. */
+.splash .mid > * { animation: rise 500ms var(--ease-out) both; }
+.splash .mid > :first-child { animation: settle 700ms var(--ease-pop) both; }
+.splash .mid > :nth-child(2) { animation-delay: 180ms; }
+.splash .mid > :nth-child(3) { animation-delay: 300ms; }
+@keyframes settle { from { opacity: 0; transform: scale(0.8) rotate(-12deg); } }
+
+/* Welcome slides: art and words crossfade with a soft blur to hide the swap. */
+.wart.swap, .wtext .swap { transition: opacity 300ms var(--ease-out), filter 300ms var(--ease-out), transform 300ms var(--ease-out); }
+@starting-style { .wart.swap, .wtext .swap { opacity: 0; filter: blur(6px); transform: scale(0.98); } }
+.wnav .dots i { transition: width 300ms var(--ease-out), background-color 300ms ease; }
+
+/* OTP: when all six digits are in, a green wave runs across the boxes. */
+@keyframes otp-ok { 40% { background: var(--sage); transform: translateY(-3px); } 100% { background: var(--sage); } }
+.otp.done input { animation: otp-ok 420ms var(--ease-out) both; }
+.otp.done input:nth-child(2) { animation-delay: 40ms; }
+.otp.done input:nth-child(3) { animation-delay: 80ms; }
+.otp.done input:nth-child(4) { animation-delay: 120ms; }
+.otp.done input:nth-child(5) { animation-delay: 160ms; }
+.otp.done input:nth-child(6) { animation-delay: 200ms; }
+
+/* Practice summary: the mascot springs in and a small kente burst goes off once. */
+.mascot { animation: settle 650ms var(--ease-pop) both; }
+.burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.burst i { position: absolute; width: 9px; height: 9px; border-radius: 3px; left: -4px; top: -4px; opacity: 0;
+  transform: rotate(var(--a)) translateY(0); animation: burst 900ms var(--ease-out) 200ms both; }
+@keyframes burst { 0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(1); } 100% { opacity: 0; transform: rotate(var(--a)) translateY(-92px) scale(.6); } }
+@keyframes unlock { 0% { box-shadow: 0 0 0 0 rgba(242, 179, 61, .55); } 100% { box-shadow: 0 0 0 16px rgba(242, 179, 61, 0); } }
+.set.unlocked .bdg { animation: pop 420ms var(--ease-pop) 700ms both, unlock 900ms ease-out 700ms; }
+
+/* Journey map: "you are here" floats and the current node breathes (draws the eye to one spot). */
+@keyframes float { 50% { transform: translateX(-50%) translateY(-4px); } }
+.here { animation: float 2.4s var(--ease-in-out) infinite; }
+.node.cur::after { content: ""; position: absolute; inset: -9px; border-radius: 50%; border: 2px solid rgba(242, 179, 61, .6); animation: breathe 2.4s var(--ease-in-out) infinite; pointer-events: none; }
+@keyframes breathe { 0%, 100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.12); opacity: 0; } }
+
+/* Chat: new messages grow from their side of the conversation; the tutor "types" first. */
+.msg { transition: opacity 260ms var(--ease-out), transform 260ms var(--ease-out); }
+.msg.me { transform-origin: bottom right; }
+.msg.ai { transform-origin: bottom left; }
+@starting-style { .msg { opacity: 0; transform: translateY(10px) scale(0.97); } }
+.typing { display: inline-flex; gap: 5px; align-items: center; padding: 14px 4px; }
+.typing i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); animation: typing 1s var(--ease-in-out) infinite; }
+.typing i:nth-child(2) { animation-delay: 150ms; }
+.typing i:nth-child(3) { animation-delay: 300ms; }
+@keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: .35; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+/* Lesson: revealed steps and quick-check results land softly. */
+.step.revealed { transition: opacity 260ms var(--ease-out), transform 260ms var(--ease-out); }
+@starting-style { .step.revealed { opacity: 0; transform: translateY(6px) scale(0.98); } }
+.achip.ok { animation: pop 380ms var(--ease-pop); }
+.note2 { transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out); }
+@starting-style { .note2 { opacity: 0; transform: translateY(6px); } }
+
+/* Mistakes notebook: a real card. Flip in 3D; swipe or tap to send it left or right; the next card rises. */
+.fstack { perspective: 1200px; }
+.fcard { position: absolute; inset: 0; transform-style: preserve-3d; touch-action: pan-y; cursor: grab;
+  transition: transform 500ms var(--ease-in-out), opacity 250ms ease; }
+.fcard[data-dragging] { transition: none; cursor: grabbing; }
+.fcard[data-flipped] .fface { transform: rotateY(180deg); }
+.fface { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 500ms var(--ease-in-out); }
+.fface > .fc { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.fface > .fc.back { transform: rotateY(180deg); }
+.fcard[data-out="right"] { transform: translateX(130%) rotate(14deg); opacity: 0; transition: transform 260ms var(--ease-out), opacity 260ms ease; }
+.fcard[data-out="left"] { transform: translateX(-130%) rotate(-14deg); opacity: 0; transition: transform 260ms var(--ease-out), opacity 260ms ease; }
+@starting-style { .fcard { transform: translateY(10px) scale(0.96); opacity: .6; } }
+.fstack .fc.b1, .fstack .fc.b2 { transition: transform 300ms var(--ease-out); }
+
+/* Mock exam: the timer warms to clay in the last five minutes. */
+.timer { transition: background-color 400ms ease, color 400ms ease; }
+.timer[data-low] { background: var(--clay-soft); color: #9A3A20; }
+
+/* ---------- 9. Toasts (Sonner): our dark pill, Sonner's motion and swipe-to-dismiss ---------- */
+.ntoast { background: var(--ink); color: #fff; border-radius: 16px; padding: 12px 18px; font: inherit; font-size: 14.5px;
+  box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .45); display: flex; align-items: center; gap: 10px; width: max-content; max-width: min(92vw, 420px); margin: 0 auto; }
+.app { --toast-bottom: calc(100px + var(--safe-bottom)); }
+@container (min-width: 900px) { .app > * { --toast-bottom: 28px; } }
+
+/* ---------- Reduced motion: fewer and gentler, not none ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; }
+  .scr > *, .stagger > *, .in, .in-next, .in-prev, .msg, .note2, .step.revealed, .tl .tm, .tl .slot { animation: fade-in 200ms ease both !important; transform: none !important; }
+  .fface, .fcard { transition: opacity 200ms ease !important; }
+  .fcard[data-flipped] .fface { transform: none; }
+  .fcard[data-flipped] .fc.front { visibility: hidden; }
+  .fface > .fc.back { transform: none; }
+  .fcard:not([data-flipped]) .fc.back { visibility: hidden; }
+  .here, .node.cur::after, .typing i { animation: none !important; }
+}
+
+/* Segmented control items (see Segmented in components/motion.tsx). */
+.seg .segitem { font: inherit; font-size: 15px; border: 0; border-radius: 999px; padding: 12px 6px; background: #F1F2EF; color: var(--ink); cursor: pointer; text-align: center; }
+.seg .clip-active .segitem { background: var(--ink); color: var(--white); }
+
+/* Plan timeline: the day's tasks arrive in order when you switch days. */
+.tl .tm, .tl .slot { animation: rise 300ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 60ms); }

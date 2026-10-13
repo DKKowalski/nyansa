@@ -31,10 +31,10 @@ export default function Plan() {
       </div>
       <h1 className="h-l" style={{ marginTop: 6 }}>{sel === 0 ? "Today's" : `${DN[days[sel].getDay()]}'s`} plan · {tasks.reduce((t, x) => t + x.min, 0)} min</h1>
       <div className="tl" key={sel}>
-        {tasks.map((t) => (
+        {tasks.map((t, i) => (
           <div key={t.title} style={{ display: "contents" }}>
-            <span className="tm">{t.time}</span>
-            <div className="slot">
+            <span className="tm" style={{ "--i": i } as React.CSSProperties}>{t.time}</span>
+            <div className="slot" style={{ "--i": i } as React.CSSProperties}>
               <div className={`tcard sm ${t.bg}`}>
                 <Deco />
                 <span className={`lvl ${t.lv === "Advanced" ? "adv" : ""}`} style={{ justifySelf: "start", background: "rgba(255,255,255,.7)", borderColor: "transparent" }}>{t.lv}</span>

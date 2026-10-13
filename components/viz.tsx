@@ -1,29 +1,36 @@
 import { strandByName } from "@/lib/content";
 
-/** Tick-mark progress bar: `on` filled ticks, an optional tall "now" marker at index `now`. */
-export function Ticks({ n, on, now, label, style, className = "" }: { n: number; on: number; now?: number; label?: string; style?: React.CSSProperties; className?: string }) {
+/** Tick-mark progress bar: `on` filled ticks, an optional tall "now" marker at index `now`.
+ *  With `from`, ticks from `from` up to `on` light up one after another (use for gains on result screens). */
+export function Ticks({ n, on, now, from, gain, label, style, className = "" }: {
+  n: number; on: number; now?: number; from?: number; gain?: boolean; label?: string; style?: React.CSSProperties; className?: string;
+}) {
   return (
     <div className={`ticks ${className}`} role={label ? "progressbar" : undefined} aria-label={label} style={style}>
-      {Array.from({ length: n }, (_, i) => (
-        <i key={i} className={i === now ? "now" : i < on ? "on" : ""} />
-      ))}
+      {Array.from({ length: n }, (_, i) => {
+        const lit = from !== undefined && i >= from && i < on && i !== now;
+        return (
+          <i key={i} className={`${i === now ? "now" : i < on ? "on" : ""}${lit ? ` lit${gain ? " gain" : ""}` : ""}`}
+            style={lit ? ({ "--i": i - from! } as React.CSSProperties) : undefined} />
+        );
+      })}
     </div>
   );
 }
 
 /** Semicircle tick gauge with a big percentage and a short message. */
-export function Gauge({ pct, msg }: { pct: number; msg?: string }) {
+export function Gauge({ pct, msg, sweep = false, children }: { pct: number; msg?: string; sweep?: boolean; children?: React.ReactNode }) {
   const n = 25, cx = 150, cy = 150, r1 = 102, r2 = 128;
   const text = msg ?? (pct >= 75 ? "Great start, keep it up!" : pct >= 40 ? "Good base. Let's build on it." : "Lots of easy wins ahead.");
   return (
     <>
-      <div className="gauge">
+      <div className={`gauge${sweep ? " sweep" : ""}`}>
         <svg viewBox="0 0 300 165" role="img" aria-label={`${pct}%`}>
           <path d="M70 150a80 80 0 0 1 160 0" fill="none" stroke="#EEF0EC" strokeWidth="2" />
           {Array.from({ length: n }, (_, i) => {
             const a = Math.PI + (i / (n - 1)) * Math.PI, on = i / (n - 1) <= pct / 100 + 1e-6;
             return (
-              <line key={i}
+              <line key={i} className={on ? "on" : undefined} style={sweep ? ({ "--i": i } as React.CSSProperties) : undefined}
                 x1={(cx + r1 * Math.cos(a)).toFixed(1)} y1={(cy + r1 * Math.sin(a)).toFixed(1)}
                 x2={(cx + r2 * Math.cos(a)).toFixed(1)} y2={(cy + r2 * Math.sin(a)).toFixed(1)}
                 stroke={on ? "#0F6B4A" : "#E6E8E3"} strokeOpacity={on ? (0.45 + 0.55 * (1 - i / n)).toFixed(2) : 1}
@@ -31,7 +38,7 @@ export function Gauge({ pct, msg }: { pct: number; msg?: string }) {
             );
           })}
         </svg>
-        <div className="val"><b>{pct}%</b></div>
+        <div className="val"><b>{children ?? `${pct}%`}</b></div>
       </div>
       <p style={{ margin: "2px 0 0", textAlign: "center", fontSize: 15, color: "var(--ink-2)", fontWeight: 300 }}>{text}</p>
     </>

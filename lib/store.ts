@@ -30,7 +30,6 @@ interface Session {
   mockEndsAt: number | null; // the mock timer keeps running if the student leaves
   tq: number; // tutor context: index into PQ, -1 = none
   chat: ChatMsg[] | null;
-  toast: { msg: string; id: number } | null;
   /** Clock for date maths, set when saved progress loads. Null during prerender so server and client HTML match. */
   now: number | null;
 }
@@ -38,7 +37,6 @@ interface Session {
 interface Actions {
   set: (p: Partial<Profile & Session>) => void;
   toggleSubject: (n: string) => void;
-  showToast: (msg: string) => void;
   startChat: (qi: number) => void;
   pushChat: (...m: ChatMsg[]) => void;
   startMock: () => void;
@@ -49,7 +47,7 @@ const profile0: Profile = {
   phone: "", name: "", role: "student", exam: null, cls: null, subjects: null, date: "",
   minutes: 30, saveData: true, mood: null, answers: {}, onboarded: false,
 };
-const session0: Session = { pans: {}, psetDone: false, mans: {}, mflag: [], mockEndsAt: null, tq: -1, chat: null, toast: null, now: null };
+const session0: Session = { pans: {}, psetDone: false, mans: {}, mflag: [], mockEndsAt: null, tq: -1, chat: null, now: null };
 
 export const MOCK_SECONDS = 9000;
 
@@ -63,7 +61,6 @@ export const useApp = create<Profile & Session & Actions>()(
         const sel = get().subjects ?? CORE.map((c) => c.name);
         set({ subjects: sel.includes(n) ? sel.filter((x) => x !== n) : [...sel, n] });
       },
-      showToast: (msg) => set({ toast: { msg, id: Date.now() } }),
       startChat: (qi) =>
         set({
           tq: qi,
@@ -80,7 +77,7 @@ export const useApp = create<Profile & Session & Actions>()(
       // Hydrated after mount by <Providers> so server and first client render match.
       skipHydration: true,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars -- session-only fields
-      partialize: ({ toast, chat, now, ...rest }) => rest,
+      partialize: ({ chat, now, ...rest }) => rest,
     },
   ),
 );

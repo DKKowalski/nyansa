@@ -5,6 +5,7 @@ import { daysLeft, examName, firstName, useApp } from "@/lib/store";
 import { I, type IconName } from "./icons";
 import { Wordmark } from "./brand";
 import { Ticks } from "./viz";
+import { ClipGroup } from "./motion";
 import { useToast } from "./toast";
 
 type NavItem = { icon: IconName; label: string; href: string | null; match: string[] };
@@ -23,18 +24,23 @@ const NAV_PARENT: NavItem[] = [
   { icon: "settings", label: "Settings", href: "/settings", match: ["/settings"] },
 ];
 
-function NavLinks({ items, withLabel }: { items: NavItem[]; withLabel: boolean }) {
+function NavLinks({ items, withLabel, className }: { items: NavItem[]; withLabel: boolean; className: string }) {
   const path = usePathname();
   const toast = useToast();
-  return items.map(({ icon, label, href, match }) => {
-    const Icon = I[icon];
-    const current = match.some((m) => path === m || path.startsWith(m + "/")) ? "page" : undefined;
-    return href ? (
-      <Link key={label} href={href} aria-label={label} aria-current={current}><Icon />{withLabel && label}</Link>
-    ) : (
-      <button key={label} type="button" aria-label={label} onClick={() => toast(`${label} comes later`)}><Icon />{withLabel && label}</button>
-    );
-  });
+  const active = items.findIndex(({ match }) => match.some((m) => path === m || path.startsWith(m + "/")));
+  return (
+    <ClipGroup className={className} items={items} active={active}
+      style={!withLabel && items.length === 4 ? { gridTemplateColumns: "repeat(4,1fr)" } : undefined}
+      render={({ icon, label, href }, i, layer) => {
+        const Icon = I[icon];
+        const body = <><Icon />{withLabel && label}</>;
+        if (layer === "active") return <span key={label} className="navitem">{body}</span>;
+        const current = i === active ? "page" : undefined;
+        return href
+          ? <Link key={label} className="navitem" href={href} aria-label={label} aria-current={current}>{body}</Link>
+          : <button key={label} type="button" className="navitem" aria-label={label} onClick={() => toast(`${label} comes later`)}>{body}</button>;
+      }} />
+  );
 }
 
 /** Student and parent shell: side menu and top bar on web, floating tab bar on phone. */
@@ -47,7 +53,7 @@ export function AppShell({ parent = false, children }: { parent?: boolean; child
       <aside className="side">
         <Wordmark size={36} />
         {parent && <span className="lvl" style={{ justifySelf: "start", marginTop: -14 }}>Parent view</span>}
-        <nav aria-label="Main"><NavLinks items={items} withLabel /></nav>
+        <nav aria-label="Main"><NavLinks items={items} withLabel className="sidegrid" /></nav>
         {parent ? (
           <div className="sidecard" style={{ background: "var(--sage)" }}><span>Linked child</span><b style={{ fontSize: 26 }}>Ama · JHS 3</b><span>BECE in {daysLeft(s)} days</span></div>
         ) : (
@@ -64,9 +70,7 @@ export function AppShell({ parent = false, children }: { parent?: boolean; child
         {children}
       </div>
       <div className="navwrap">
-        <nav className="nav" aria-label="Main" style={parent ? { gridTemplateColumns: "repeat(4,1fr)" } : undefined}>
-          <NavLinks items={items} withLabel={false} />
-        </nav>
+        <nav aria-label="Main"><NavLinks items={items} withLabel={false} className="nav" /></nav>
       </div>
     </div>
   );

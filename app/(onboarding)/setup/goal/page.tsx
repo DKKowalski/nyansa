@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { CtaLink } from "@/components/ui";
+import { Segmented } from "@/components/motion";
 import { I } from "@/components/icons";
 import { SetupTop } from "@/components/shells";
 import { daysLeft, examDate, examName, useApp } from "@/lib/store";
@@ -15,7 +16,8 @@ export default function Goal() {
   const date = examDate(s);
   const d0 = new Date(date + "T00:00:00");
   const [[y, m], setYM] = useState<[number, number]>([d0.getFullYear(), d0.getMonth()]);
-  const shift = (k: number) => setYM(([yy, mm]) => { const t = new Date(yy, mm + k, 1); return [t.getFullYear(), t.getMonth()]; });
+  const [dir, setDir] = useState<"next" | "prev">("next");
+  const shift = (k: number) => { setDir(k > 0 ? "next" : "prev"); setYM(([yy, mm]) => { const t = new Date(yy, mm + k, 1); return [t.getFullYear(), t.getMonth()]; }); };
 
   const lead = (new Date(y, m, 1).getDay() + 6) % 7, dim = new Date(y, m + 1, 0).getDate();
   const left = daysLeft(s), hrs = Math.round((left * s.minutes) / 60);
@@ -33,7 +35,7 @@ export default function Goal() {
               <button type="button" className="cbtn sm ghost" aria-label="Previous month" onClick={() => shift(-1)}><I.chevL /></button>
               <button type="button" className="cbtn sm ghost" aria-label="Next month" onClick={() => shift(1)}><I.chevR /></button>
             </div>
-            <div className="grid">
+            <div className={`grid in-${dir}`} key={`${y}-${m}`}>
               {["M", "T", "W", "T", "F", "S", "S"].map((x, i) => <span key={i} className="dow">{x}</span>)}
               {Array.from({ length: lead }, (_, i) => <span key={`o${i}`} className="d out">{new Date(y, m, i - lead + 1).getDate()}</span>)}
               {Array.from({ length: dim }, (_, i) => {
@@ -49,9 +51,8 @@ export default function Goal() {
         </div>
         <div className="col">
           <div className="sec"><h3>Study time each day</h3></div>
-          <div className="seg">
-            {[15, 30, 60, 90].map((mn) => <button key={mn} type="button" aria-pressed={s.minutes === mn} onClick={() => s.set({ minutes: mn })}>{mn} min</button>)}
-          </div>
+          <Segmented label="Study time each day" value={s.minutes} onChange={(mn) => s.set({ minutes: mn })}
+            options={[15, 30, 60, 90].map((mn) => ({ value: mn, label: `${mn} min` }))} />
           <p className="small m-only">That&apos;s about <b>{hrs} hours</b> of study before the exam.</p>
           <div className="gcard w-only" style={{ flexDirection: "column" }}>
             <span className="small">Before your exam you&apos;ll study</span>

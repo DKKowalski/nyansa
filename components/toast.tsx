@@ -1,23 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useApp } from "@/lib/store";
+import { toast, Toaster as Sonner } from "sonner";
 
-export function Toast() {
-  const toast = useApp((s) => s.toast);
-  const [hidden, setHidden] = useState<number | null>(null);
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setHidden(toast.id), 1800);
-    return () => clearTimeout(t);
-  }, [toast]);
+/** Sonner toasts in Nyansa's dark pill. Sonner owns the motion: slide in from the bottom, stack, swipe to dismiss,
+ *  pause while the tab is hidden. Sits above the tab bar on phone, near the bottom edge on web. */
+export function Toaster() {
   return (
-    <div className={`toast${toast && hidden !== toast.id ? " show" : ""}`} role="status" aria-live="polite">
-      {toast?.msg}
-    </div>
+    <Sonner position="bottom-center" duration={2200} visibleToasts={3} gap={8}
+      offset={{ bottom: "var(--toast-bottom)" }} mobileOffset={{ bottom: "var(--toast-bottom)" }}
+      toastOptions={{ unstyled: true, classNames: { toast: "ntoast" } }} />
   );
 }
 
 /** Shows a short message, e.g. for features that come in a later build. */
 export function useToast() {
-  return useApp((s) => s.showToast);
+  return (msg: string) => { toast(msg); };
 }

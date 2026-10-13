@@ -5,6 +5,7 @@ import { I } from "@/components/icons";
 import { useToast } from "@/components/toast";
 import { Sheet } from "@/components/ui";
 import { Ticks } from "@/components/viz";
+import { haptic } from "@/components/motion";
 import { MQ } from "@/lib/content";
 import { MOCK_SECONDS, useApp } from "@/lib/store";
 
@@ -28,7 +29,9 @@ export default function MockExam() {
   const router = useRouter();
   const toast = useToast();
   const { mans, mflag, mockEndsAt, set, startMock } = useApp();
-  const [mi, setMi] = useState(0);
+  const [mi, setMiRaw] = useState(0);
+  const [dir, setDir] = useState<"next" | "prev">("next");
+  const setMi = (i: number) => { setDir(i < mi ? "prev" : "next"); setMiRaw(i); };
   const [hide, setHide] = useState(false);
   const [grid, setGrid] = useState(false);
   const [tick, setTick] = useState<number | null>(null);
@@ -65,17 +68,17 @@ export default function MockExam() {
       <div className="mbar">
         <button type="button" className="cbtn" aria-label="Leave the exam" onClick={() => { toast("Your answers are saved. The timer keeps running."); router.push("/mocks"); }}><I.close /></button>
         <div className="grow" style={{ flex: 1 }}><b style={{ fontWeight: 500 }}>Maths Mock 1</b><br /><span className="small">Paper 1 · {Object.keys(mans).length} of {n} answered</span></div>
-        <button type="button" className="timer" aria-label={hide ? "Show timer" : "Hide timer"} onClick={() => setHide(!hide)}><I.clock /><span>{hide ? "Hidden" : fmt(left)}</span></button>
+        <button type="button" className="timer" data-low={mockEndsAt && left < 300 ? "" : undefined} aria-label={hide ? "Show timer" : "Hide timer"} onClick={() => setHide(!hide)}><I.clock /><span>{hide ? "Hidden" : fmt(left)}</span></button>
       </div>
       <Ticks n={n * 3} on={mi * 3} now={mi * 3} label={`Question ${mi + 1} of ${n}`} />
       <div className="cols">
-        <div className="col" key={mi}>
+        <div className={`col in-${dir}`} key={mi}>
           <div className="q"><span className="k"><span className="pill">Question {mi + 1}</span>{q.strand ?? "Algebra"}</span><div className="t">{q.q}</div></div>
           <div className="ans">
             {q.opts.map((o, i) => <button key={i} type="button" aria-pressed={a === i} onClick={() => set({ mans: { ...mans, [mi]: i } })}><span className="l">{"ABCD"[i]}</span>{o}</button>)}
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <button type="button" className="mflag" aria-pressed={flagged} onClick={() => set({ mflag: flagged ? mflag.filter((x) => x !== mi) : [...mflag, mi] })}>▲ {flagged ? "Flagged" : "Flag for review"}</button>
+            <button type="button" className="mflag" aria-pressed={flagged} onClick={() => { haptic("tap"); set({ mflag: flagged ? mflag.filter((x) => x !== mi) : [...mflag, mi] }); }}>▲ {flagged ? "Flagged" : "Flag for review"}</button>
             <div style={{ flex: 1 }} />
             <button type="button" className="mflag m-only" onClick={() => setGrid(true)}>All questions</button>
           </div>

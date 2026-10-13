@@ -5,6 +5,7 @@ import { I } from "@/components/icons";
 import { BackLink } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { Toggle } from "@/components/ui";
+import { CopyButton } from "@/components/motion";
 import { examDate, examName, firstName, subjectsOf, useApp } from "@/lib/store";
 
 /** S3 Settings: setup choices, save data, reminders, parent link code, downloads. */
@@ -38,7 +39,10 @@ export default function Settings() {
         <div className="col">
           <div className="pcard bg-lilac" style={{ cursor: "default" }}>
             <span className="ico"><I.people /></span><span className="k">Parent link code</span>
-            <span className="n" style={{ fontSize: 34, fontWeight: 300, letterSpacing: ".12em" }}>482 916</span>
+            <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <span className="n" style={{ fontSize: 34, fontWeight: 300, letterSpacing: ".12em" }}>482 916</span>
+              <CopyButton text="482916" label="Copy link code" onCopied={() => toast("Link code copied")} />
+            </span>
             <span className="small" style={{ color: "var(--ink-2)" }}>Give this to a parent or guardian so they can follow your progress.</span>
           </div>
           <div className="gcard" style={{ padding: "4px 18px" }}>

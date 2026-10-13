@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { TutorFace } from "@/components/brand";
 import { CtaLink } from "@/components/ui";
+import { haptic } from "@/components/motion";
 import { examName, firstName, useApp, type Mood } from "@/lib/store";
 
 const MOODS: [Mood, string, string][] = [["confident", "🤩", "Ready!"], ["okay", "🙂", "Okay"], ["nervous", "🫣", "Nervous"]];
@@ -23,11 +24,11 @@ export default function CheckIn() {
           <div className="tutor"><TutorFace /><p>Hey {firstName(name)}! Let&apos;s find your starting point in Maths. How are you feeling about it?</p></div>
           <div className="moods">
             {MOODS.map(([v, e, l]) => (
-              <button key={v} type="button" className="mood" aria-pressed={mood === v} onClick={() => set({ mood: v })}><span className="em">{e}</span><b>{l}</b></button>
+              <button key={v} type="button" className="mood" aria-pressed={mood === v} onClick={() => { haptic("tap"); set({ mood: v }); }}><span className="em">{e}</span><b>{l}</b></button>
             ))}
           </div>
           {mood && (
-            <div className="tutor"><span className="face" style={{ visibility: "hidden" }}>N</span><p style={{ fontSize: 18, fontWeight: 400, color: "var(--ink-2)" }}>{REPLY[mood]}</p></div>
+            <div className="tutor in" key={mood}><span className="face" style={{ visibility: "hidden" }}>N</span><p style={{ fontSize: 18, fontWeight: 400, color: "var(--ink-2)" }}>{REPLY[mood]}</p></div>
           )}
         </div>
         <div className="col w-only">

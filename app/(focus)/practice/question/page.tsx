@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { I } from "@/components/icons";
 import { BackLink } from "@/components/shells";
 import { Ticks } from "@/components/viz";
+import { haptic } from "@/components/motion";
 import { PQ } from "@/lib/content";
 import { useApp } from "@/lib/store";
 
@@ -31,8 +32,8 @@ export default function PracticeQuestion() {
           <Ticks n={PQ.length * 4} on={pi * 4} now={pi * 4} label={`Question ${pi + 1} of ${PQ.length}`} />
           <span className="small" style={{ fontWeight: 500, color: "var(--ink)" }}>{pi + 1}/{PQ.length}</span>
         </div>
-        <div className="q" key={pi}><span className="k"><span className={`lvl ${q.lv === "Advanced" ? "adv" : ""}`}>{q.lv}</span>Set 2</span><div className="t">{q.q}</div></div>
-        <div className="ans">
+        <div className="q in-next" key={pi}><span className="k"><span className={`lvl ${q.lv === "Advanced" ? "adv" : ""}`}>{q.lv}</span>Set 2</span><div className="t">{q.q}</div></div>
+        <div className="ans in-next" key={`a${pi}`}>
           {q.opts.map((o, i) => (
             <button key={i} type="button" aria-pressed={a === i} disabled={checked} style={optStyle(i)} onClick={() => set({ pans: { ...pans, [pi]: i } })}>
               <span className="l">{"ABCD"[i]}</span>{o}
@@ -41,7 +42,7 @@ export default function PracticeQuestion() {
         </div>
         {!checked && (
           <div className="cta">
-            <button type="button" className="btn" disabled={a === undefined} onClick={() => setChecked(true)}>Check answer</button>
+            <button type="button" className="btn" disabled={a === undefined} onClick={() => { if (ok) haptic("success"); setChecked(true); }}>Check answer</button>
             <button type="button" className="btn text" onClick={ask}>I&apos;m stuck, ask the tutor</button>
           </div>
         )}

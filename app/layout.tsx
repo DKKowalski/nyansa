@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "@/styles/base.css";
 import "@/styles/components.css";
+import "@/styles/motion.css";
 
 const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"], weight: ["200", "300", "400", "500", "600", "700"] });
 

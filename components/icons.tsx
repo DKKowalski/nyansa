@@ -19,6 +19,7 @@ export const I = {
   up: svg(<path d="M7 17 17 7M8 7h9v9" />, line()),
   check: svg(<path d="m5 12.5 4.5 4.5L19 7.5" />, line(2.2)),
   close: svg(<path d="M6 6l12 12M18 6 6 18" />, line(2)),
+  copy: svg(<><rect x="8.5" y="8.5" width="11" height="11" rx="2.5" /><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2" /></>, line(1.7)),
   bell: svg(<><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" /><path d="M10 20.5a2 2 0 0 0 4 0" /></>, line(1.7)),
   search: svg(<><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></>, line(1.7)),
   cal: svg(<><rect x="4" y="5" width="16" height="15" rx="3" /><path d="M8 3v4M16 3v4M4 10h16M8 14h.01M12 14h.01M16 14h.01" /></>, line(1.7)),

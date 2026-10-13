@@ -4,6 +4,7 @@ import { I } from "@/components/icons";
 import { SetupTop } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { Toggle } from "@/components/ui";
+import { BusyButton } from "@/components/motion";
 import { StatRow } from "@/components/viz";
 import { useApp } from "@/lib/store";
 
@@ -38,7 +39,7 @@ export default function Prefs() {
         </div>
       </div>
       <div className="cta">
-        <button type="button" className="btn green" onClick={() => { set({ onboarded: true }); router.push("/check-in"); }}>Finish setup</button>
+        <BusyButton className="btn green" busyLabel="Setting up your plan…" wait={900} onDone={() => { set({ onboarded: true }); router.push("/check-in"); }}>Finish setup</BusyButton>
       </div>
     </div>
   );

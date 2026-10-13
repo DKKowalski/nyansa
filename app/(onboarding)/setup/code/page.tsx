@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
-import { CtaLink } from "@/components/ui";
+import { useRouter } from "next/navigation";
+import { BusyButton, haptic } from "@/components/motion";
 import { SetupTop, SmsBox } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { useApp } from "@/lib/store";
@@ -9,6 +10,7 @@ import { useApp } from "@/lib/store";
 export default function Code() {
   const phone = useApp((s) => s.phone);
   const toast = useToast();
+  const router = useRouter();
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const ok = code.join("").length === 6;
@@ -24,6 +26,7 @@ export default function Code() {
     }
     const next = [...code]; next[i] = digits;
     setCode(next);
+    if (next.join("").length === 6) haptic("success");
     if (digits && i < 5) refs.current[i + 1]?.focus();
   }
 
@@ -35,7 +38,7 @@ export default function Code() {
           <p className="hello">Check your messages</p>
           <h1 className="h-xl">Enter the code</h1>
           <p className="lead">Sent to +233 {phone || "24 123 4567"}</p>
-          <div className="otp">
+          <div className={`otp${ok ? " done" : ""}`}>
             {code.map((d, i) => (
               <input key={i} ref={(el) => { refs.current[i] = el; }} className="input" inputMode="numeric" autoComplete={i === 0 ? "one-time-code" : "off"}
                 aria-label={`Digit ${i + 1}`} value={d} autoFocus={i === 0}
@@ -48,7 +51,7 @@ export default function Code() {
         <div className="col w-only"><SmsBox got /></div>
       </div>
       <div className="cta">
-        <CtaLink href="/setup/name" ready={ok}>Verify</CtaLink>
+        <BusyButton busyLabel="Checking…" wait={600} disabled={!ok} onDone={() => router.push("/setup/name")}>Verify</BusyButton>
         <button type="button" className="btn text" onClick={() => toast("New code sent")}>Send a new code</button>
       </div>
     </div>

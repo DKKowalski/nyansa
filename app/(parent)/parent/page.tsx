@@ -5,6 +5,7 @@ import { Avatar } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { Gauge, StatRow } from "@/components/viz";
 import { CORE } from "@/lib/content";
+import { BusyButton, Num } from "@/components/motion";
 
 const ENC = ["Well done, Ama!", "Keep going!", "I'm proud of you", "Remember your study time today"];
 const GRADES = ["Grade 5", "Grade 4", "Not started", "Not started"], PCTS = [45, 55, 0, 0];
@@ -28,11 +29,13 @@ export default function ParentHome() {
           <div className="gcard">
             <b style={{ fontWeight: 500, fontSize: 18 }}>Send Ama some encouragement</b>
             <div className="enc" style={{ marginTop: 10 }}>{ENC.map((m) => <button key={m} type="button" aria-pressed={enc === m} onClick={() => setEnc(m)}>{m}</button>)}</div>
-            <button type="button" className="btn" style={{ marginTop: 12 }} disabled={!enc} onClick={() => { toast("Sent. Ama will see it on her Home screen."); setEnc(null); }}>Send</button>
+            <div style={{ marginTop: 12, display: "grid" }}>
+              <BusyButton busyLabel="Sending…" doneLabel="Sent to Ama" disabled={!enc} onDone={() => { toast("Ama will see it on her Home screen."); setEnc(null); }}>Send</BusyButton>
+            </div>
           </div>
         </div>
         <div className="col">
-          <div className="gcard"><div className="hd"><div><b>Weekly study goal</b><span>2 h 45 min of 3 h 30 min</span></div></div><Gauge pct={79} msg="Close to her goal this week" /></div>
+          <div className="gcard"><div className="hd"><div><b>Weekly study goal</b><span>2 h 45 min of 3 h 30 min</span></div></div><Gauge pct={79} msg="Close to her goal this week" sweep><Num value={79} from={0} suffix="%" /></Gauge></div>
           <div className="gcard" style={{ padding: "10px 20px" }}>
             <b style={{ fontWeight: 500, fontSize: 18, marginTop: 8 }}>Subjects</b>
             {CORE.map((c, i) => <StatRow key={c.name} icon={c.abbr} iconBg={c.bg} label={c.name} value={GRADES[i]} pct={PCTS[i]} />)}

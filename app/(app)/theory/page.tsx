@@ -5,6 +5,7 @@ import { I } from "@/components/icons";
 import { BackLink } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { THEORY } from "@/lib/content";
+import { BusyButton, Num } from "@/components/motion";
 import { useApp } from "@/lib/store";
 
 /** P5 Theory answer marking: marks per step against a WAEC-style scheme. Sample marking until AI is connected. */
@@ -26,16 +27,16 @@ export default function Theory() {
           ) : (<>
             <textarea className="ta" aria-label="Your working" value={ans} onChange={(e) => setAns(e.target.value)} />
             <div style={{ display: "flex", gap: 8 }}><button type="button" className="mflag" onClick={() => toast("Photo upload comes after the beta")}><I.camera width={18} height={18} /> Upload a photo instead</button></div>
-            <div className="cta"><button type="button" className="btn" disabled={!ans.trim()} onClick={() => setMarked(true)}>Mark my answer</button></div>
+            <div className="cta"><BusyButton busyLabel="Marking against the WAEC scheme…" wait={1300} disabled={!ans.trim()} onDone={() => setMarked(true)}>Mark my answer</BusyButton></div>
           </>)}
         </div>
         <div className="col">
           {marked ? (<>
             <div className="gcard" role="status">
               <span className="small" style={{ color: "var(--ink-2)" }}>AI marking against the WAEC scheme</span>
-              <div className="big"><b>{got}<span style={{ fontSize: 40, color: "var(--muted)" }}>/{THEORY.marks}</span></b><span>So close! One slip at the end.</span></div>
+              <div className="big"><b><Num value={got} from={0} /><span style={{ fontSize: 40, color: "var(--muted)" }}>/{THEORY.marks}</span></b><span>So close! One slip at the end.</span></div>
             </div>
-            <div className="marks">
+            <div className="marks stagger">
               {THEORY.points.map((p) => (
                 <div key={p.b} className="mk">
                   <span className="ic" style={{ background: p.ok ? "var(--leaf)" : "var(--clay)" }}>{p.ok ? <I.check /> : <I.close />}</span>

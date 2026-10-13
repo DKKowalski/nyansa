@@ -1,11 +1,13 @@
 "use client";
-import { CtaLink } from "@/components/ui";
+import { useRouter } from "next/navigation";
+import { BusyButton } from "@/components/motion";
 import { SetupTop, SmsBox } from "@/components/shells";
 import { useApp } from "@/lib/store";
 
 /** A2 Sign up: phone number. */
 export default function Phone() {
   const { phone, set } = useApp();
+  const router = useRouter();
   const ok = phone.replace(/\D/g, "").length >= 9;
   return (
     <div className="scr">
@@ -25,7 +27,7 @@ export default function Phone() {
         <div className="col w-only"><SmsBox got={false} /></div>
       </div>
       <div className="cta">
-        <CtaLink href="/setup/code" ready={ok}>Send code</CtaLink>
+        <BusyButton busyLabel="Sending code…" disabled={!ok} onDone={() => router.push("/setup/code")}>Send code</BusyButton>
       </div>
     </div>
   );

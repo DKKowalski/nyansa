@@ -98,11 +98,13 @@ export default function Welcome() {
       <div className="wgrid" {...swipe}>
         <div className="wpanel" style={{ background: sl.bg }}>
           <svg className="knotbg" viewBox="0 0 100 100" aria-hidden="true"><KnotMark color="#ffffff" /></svg>
-          <div className="wart" key={i}>{sl.art()}</div>
+          <div className="wart swap" key={i}>{sl.art()}</div>
         </div>
         <div className="wtext">
-          <h1 className="wtitle">{sl.t}</h1>
-          <p className="wsub">{sl.s}</p>
+          <div className="swap" key={i} style={{ display: "grid", gap: 14 }}>
+            <h1 className="wtitle">{sl.t}</h1>
+            <p className="wsub">{sl.s}</p>
+          </div>
           {last ? (
             <div className="cta" style={{ marginTop: "auto" }}>
               <Link className="btn" href="/setup/phone">Continue with phone number</Link>

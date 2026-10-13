@@ -3,6 +3,7 @@ import { I } from "@/components/icons";
 import { BackLink } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { StatRow, StrandRow } from "@/components/viz";
+import { Num } from "@/components/motion";
 import { MQ } from "@/lib/content";
 import { useApp } from "@/lib/store";
 
@@ -24,14 +25,14 @@ export default function MockResults() {
       <p className="hello">BECE Maths Mock 1 · results</p>
       <div className="cols">
         <div className="col">
-          <div className="gcard"><span className="small" style={{ color: "var(--ink-2)" }}>Your grade (1 is best)</span><div className="big"><b>{gr}</b><span>{tot} of 100 marks<br />Target: grade 1</span></div></div>
-          <div className="gcard" style={{ padding: "10px 20px" }}>
+          <div className="gcard"><span className="small" style={{ color: "var(--ink-2)" }}>Your grade (1 is best)</span><div className="big"><b><Num value={gr} from={9} /></b><span><Num value={tot} from={0} /> of 100 marks<br />Target: grade 1</span></div></div>
+          <div className="gcard grow" style={{ padding: "10px 20px" }}>
             <StatRow icon="P1" iconBg="bg-sage" label="Paper 1 · Objectives" value={`${p1}/40`} pct={(p1 / 40) * 100} />
             <StatRow icon="P2" iconBg="bg-lilac" label="Paper 2 · Theory (AI-marked)" value={`${P2}/60`} pct={(P2 / 60) * 100} color="#7A5BC2" />
           </div>
         </div>
         <div className="col">
-          <div className="gcard">
+          <div className="gcard grow">
             <b style={{ fontWeight: 500, fontSize: 18 }}>Where you lost marks</b>
             {L.length ? L.map(([st, k]) => <StrandRow key={st} name={st} value={`${k} wrong`} pct={Math.min(100, (k / n) * 300)} />) : <p className="lead">No objective marks lost. Excellent!</p>}
           </div>

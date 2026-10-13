@@ -11,16 +11,17 @@ export default function Questions() {
   const router = useRouter();
   const { answers, set } = useApp();
   const [qi, setQi] = useState(0);
+  const [dir, setDir] = useState<"next" | "prev">("next");
   const q = QUESTIONS[qi], a = answers[qi], n = QUESTIONS.length, per = 3;
   const pick = (v: number) => set({ answers: { ...answers, [qi]: v } });
   return (
     <div className="scr">
       <div className="top">
-        <button type="button" className="cbtn" aria-label="Back" onClick={() => (qi > 0 ? setQi(qi - 1) : router.push("/check-in"))}><I.back /></button>
+        <button type="button" className="cbtn" aria-label="Back" onClick={() => { if (qi > 0) { setDir("prev"); setQi(qi - 1); } else router.push("/check-in"); }}><I.back /></button>
         <Ticks n={n * per} on={qi * per} now={qi * per} label={`Question ${qi + 1} of ${n}`} />
         <span className="small" style={{ fontWeight: 500, color: "var(--ink)" }}>{qi + 1}/{n}</span>
       </div>
-      <div className="cols obc" key={qi}>
+      <div className={`cols obc in-${dir}`} key={qi}>
         <div className="col">
           <div className="q qbig"><span className="k"><span className="pill">Maths</span>{q.strand}</span><div className="t">{q.q}</div></div>
         </div>
@@ -34,7 +35,7 @@ export default function Questions() {
         </div>
       </div>
       <div className="cta">
-        <button type="button" className="btn" disabled={a === undefined} onClick={() => (qi < n - 1 ? setQi(qi + 1) : router.push("/check-in/results"))}>
+        <button type="button" className="btn" disabled={a === undefined} onClick={() => { if (qi < n - 1) { setDir("next"); setQi(qi + 1); } else router.push("/check-in/results"); }}>
           {qi === n - 1 ? "See my results" : "Next question"}
         </button>
       </div>

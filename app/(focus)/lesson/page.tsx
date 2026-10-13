@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { BackLink } from "@/components/shells";
 import { Ticks } from "@/components/viz";
+import { haptic } from "@/components/motion";
 
 const STEPS: [string, string][] = [["Subtract 3 from both sides", "2x = 8"], ["Divide both sides by 2", "x = 4"], ["Check: put 4 back in", "2 × 4 + 3 = 11 ✓"]];
 const CHECK = ["x = 5", "x = 15", "x = 3", "x = 25"];
@@ -11,6 +12,7 @@ const CHECK = ["x = 5", "x = 15", "x = 3", "x = 25"];
 export default function Lesson() {
   const router = useRouter();
   const [st, setSt] = useState(0);
+  const [dir, setDir] = useState<"next" | "prev">("next");
   const [reveal, setReveal] = useState(0);
   const [pick, setPick] = useState<number | null>(null);
 
@@ -44,8 +46,8 @@ export default function Lesson() {
       body: (<>
         <div className="steps">
           {STEPS.map(([a, b], i) => i < reveal
-            ? <div key={i} className="step"><span className="n">{i + 1}</span><span className="tx"><b>{a}</b><span>{b}</span></span></div>
-            : <div key={i} className="step hidden"><span className="n">{i + 1}</span><span className="tx"><b>Step {i + 1}</b></span></div>)}
+            ? <div key={`s${i}`} className="step revealed"><span className="n">{i + 1}</span><span className="tx"><b>{a}</b><span>{b}</span></span></div>
+            : <div key={`h${i}`} className="step hidden"><span className="n">{i + 1}</span><span className="tx"><b>Step {i + 1}</b></span></div>)}
         </div>
         {reveal < 3
           ? <button type="button" className="btn light" onClick={() => setReveal(reveal + 1)}>Show next step</button>
@@ -56,7 +58,7 @@ export default function Lesson() {
       kind: "Quick check", title: "Solve 3x − 5 = 10", gate: pick !== null,
       body: (<>
         <div className="achips">
-          {CHECK.map((o, i) => <button key={i} type="button" className={`achip ${pick === null ? "" : i === 0 ? "ok" : i === pick ? "no" : ""}`} disabled={pick !== null} onClick={() => setPick(i)}>{o}</button>)}
+          {CHECK.map((o, i) => <button key={i} type="button" className={`achip ${pick === null ? "" : i === 0 ? "ok" : i === pick ? "no" : ""}`} disabled={pick !== null} onClick={() => { if (i === 0) haptic("success"); setPick(i); }}>{o}</button>)}
         </div>
         {pick !== null && (pick === 0
           ? <div className="note2 bg-sage" role="status"><b>Correct.</b> Add 5 to both sides: 3x = 15. Divide by 3: x = 5.</div>
@@ -83,16 +85,16 @@ export default function Lesson() {
         <Ticks n={n * 5} on={st * 5 + 5} label={`Card ${st + 1} of ${n}`} />
         <span className="small" style={{ fontWeight: 500, color: "var(--ink)" }}>{st + 1}/{n}</span>
       </div>
-      <div className="lcard" key={st}>
+      <div className={`lcard in-${dir}`} key={st}>
         <span className="kick"><span className="pill">Linear equations</span>{L.kind}</span>
         <h1>{L.title}</h1>
         {L.body}
       </div>
       <div className="cta">
-        <button type="button" className="btn" disabled={L.gate === false} onClick={() => (st < n - 1 ? setSt(st + 1) : router.push("/practice/sets"))}>
+        <button type="button" className="btn" disabled={L.gate === false} onClick={() => { if (st < n - 1) { setDir("next"); setSt(st + 1); } else router.push("/practice/sets"); }}>
           {st === n - 1 ? "Practise now" : "Continue"}
         </button>
-        {st > 0 && <button type="button" className="btn text" onClick={() => setSt(st - 1)}>Back</button>}
+        {st > 0 && <button type="button" className="btn text" onClick={() => { setDir("prev"); setSt(st - 1); }}>Back</button>}
       </div>
     </div>
   );

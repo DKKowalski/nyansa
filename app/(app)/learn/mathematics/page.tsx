@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import Link from "next/link";
 import { KnotMark } from "@/components/brand";
 import { I } from "@/components/icons";
@@ -12,6 +13,11 @@ const XS = [170, 252, 170, 88]; // zig-zag x positions of topic nodes on the 340
 /** L2 Syllabus journey: units as a winding path with kente unit pills and a "you are here" marker. */
 export default function Journey() {
   const toast = useToast();
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const t = setTimeout(() => document.querySelector(".node.cur")?.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" }), 350);
+    return () => clearTimeout(t);
+  }, []);
   let y = 0, ti = 0;
   const pts: [number, number, string][] = [];
   const nodes: React.ReactNode[] = [];
