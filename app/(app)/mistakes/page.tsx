@@ -55,7 +55,6 @@ export default function Mistakes() {
   return (
     <div className="scr">
       <div className="top"><BackLink href="/practice" /><div className="grow" /><span className="lvl">{done} of {MISTAKES.length} reviewed</span></div>
-      <p className="hello">Mistakes notebook</p>
       <h1 className="h-xl">Review your mistakes</h1>
       <div className="cols">
         <div className="col">

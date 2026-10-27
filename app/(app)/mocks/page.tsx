@@ -5,7 +5,7 @@ import { I } from "@/components/icons";
 import { BackLink } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { CORE, MQ } from "@/lib/content";
-import { daysLeft, examName, useApp } from "@/lib/store";
+import { useApp } from "@/lib/store";
 
 const TIME: Record<string, string> = { "Mathematics": "2 h 30 min", "English Language": "2 h", "Integrated Science": "2 h 30 min", "Social Studies": "2 h" };
 
@@ -24,7 +24,6 @@ export default function Mocks() {
   return (
     <div className="scr">
       <div className="top"><BackLink href="/practice" /><div className="grow" /></div>
-      <p className="hello">{examName(s.exam)} · {daysLeft(s)} days to go</p>
       <h1 className="h-xl">Mock exams</h1>
       <div className="cols">
         <div className="col">

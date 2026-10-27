@@ -1,10 +1,11 @@
 "use client";
 import { useState } from "react";
+import { Art } from "@/components/art";
 import { BusyButton } from "@/components/motion";
 import { SetupTop, useNextStep } from "@/components/shells";
 import { Hint, PasswordField, PasswordRules } from "@/components/ui";
 import { FIRST_USERNAMES, isMinor, passwordProblem, suggestUsernames, usernameProblem } from "@/lib/account";
-import { firstName, useApp } from "@/lib/store";
+import { useApp } from "@/lib/store";
 
 /** A4 Username and password, the last account step. Others may see a username, so students
  *  under 18 are steered away from their real name. The password is never saved on the device. */
@@ -25,7 +26,6 @@ export default function Username() {
       <SetupTop />
       <div className="cols obc">
         <div className="col">
-          <p className="hello">Last step, {firstName(s.name)}</p>
           <h1 className="h-xl">Pick a username and password</h1>
           <p className="lead">You&apos;ll sign in with these{minor ? "" : `, or with your ${s.contact === "email" ? "email" : "phone number"}`}.</p>
           <input className="input" autoComplete="username" autoCapitalize="none" spellCheck={false} aria-label="Username" placeholder="Username, e.g. BraveKente27"
@@ -42,16 +42,7 @@ export default function Username() {
           <PasswordField value={pass} onChange={setPass} />
           <PasswordRules value={pass} username={user} />
         </div>
-        <div className="col w-only">
-          <div className="tcard bg-forest logincard">
-            <span className="k" style={{ color: "#BFD9CB" }}>Your login · Nyansa</span>
-            <div className="lc-row"><span>Username</span><b>{user || "…"}</b></div>
-            <div className="lc-row"><span>Password</span><b>{pass ? "•".repeat(Math.min(pass.length, 14)) : "…"}</b></div>
-            <span className="small" style={{ color: "#BFD9CB" }}>
-              {minor ? `Forgot it? ${s.guardian?.name.split(/\s+/)[0] || "Your parent"} can reset it for you.` : "Forgot it? We send a code to reset it."}
-            </span>
-          </div>
-        </div>
+        <div className="col w-only"><Art kind="username" /></div>
       </div>
       <div className="cta">
         <BusyButton busyLabel="Creating your account…" wait={800} disabled={!ready} onDone={() => { s.set({ username: user.trim() }); next(); }}>Create account</BusyButton>

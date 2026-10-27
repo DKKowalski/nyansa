@@ -15,7 +15,6 @@ export default function Sets() {
   return (
     <div className="scr">
       <div className="top"><BackLink href="/learn/mathematics/linear-equations" /><div className="grow" /></div>
-      <p className="hello">Practice · Linear equations</p>
       <h1 className="h-xl">Practice sets</h1>
       <div className="cols">
         <div className="col">

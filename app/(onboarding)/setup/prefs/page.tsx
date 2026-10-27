@@ -16,14 +16,12 @@ export default function Prefs() {
   return (
     <div className="scr">
       <SetupTop />
-      <p className="hello">Almost done</p>
       <h1 className="h-xl">Data and language</h1>
       <div className="cols obc">
         <div className="col">
           <Toggle icon={<I.wifi />} iconBg="var(--sage)" title="Save data" sub="Pictures load only when you tap them" checked={saveData} onChange={(v) => set({ saveData: v })} />
           <div className="sec"><h3>Explanations in</h3></div>
           <div className="chips" style={{ flexWrap: "wrap" }}>
-            <span className="chip icon"><I.globe /></span>
             <button type="button" className="chip" aria-pressed="true">English</button>
             {["Twi", "Ewe", "Ga"].map((l) => <button key={l} type="button" className="chip" style={{ opacity: 0.55 }} onClick={() => toast(`${l} is coming later`)}>{l} · soon</button>)}
           </div>

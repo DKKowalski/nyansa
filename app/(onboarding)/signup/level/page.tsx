@@ -11,7 +11,6 @@ export default function Level() {
   return (
     <div className="scr">
       <SetupTop />
-      <p className="hello">Create your account</p>
       <h1 className="h-xl">What level are you at?</h1>
       <p className="lead">So your lessons match where you are in school. You can change it later.</p>
       <div className="grid2 levelgrid">

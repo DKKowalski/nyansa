@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Art } from "@/components/art";
 import { Wordmark } from "@/components/brand";
 import { BusyButton } from "@/components/motion";
 import { useToast } from "@/components/toast";
@@ -26,11 +27,10 @@ export default function Approve() {
       <div className="top"><Wordmark size={32} /><div className="grow" /></div>
       <div className="cols obc">
         <div className="col">
-          <p className="hello">For {parent || "the parent or guardian"}</p>
           <h1 className="h-xl">{done ? `${kid}'s account is approved` : `${kid} wants to study with Nyansa`}</h1>
           <p className="lead">{done
             ? `Thank you. ${kid} can keep studying, and you'll get a short report every week.`
-            : `Nyansa helps students prepare for the BECE and WASSCE. ${kid} has made an account and listed you as their ${s.guardian?.relation.toLowerCase() || "parent or guardian"}. Please check the details and approve within 7 days.`}</p>
+            : `${parent ? `${parent}, ` : ""}${kid} has made an account and listed you as their ${s.guardian?.relation.toLowerCase() || "parent or guardian"}. Nyansa helps students prepare for the BECE and WASSCE. Please check the details and approve within 7 days.`}</p>
           <div className="gcard" style={{ padding: "4px 18px" }}>
             {facts.map(([b, v]) => <div key={b} className="setrow"><span className="tx"><b>{b}</b></span><span className="v">{v}</span></div>)}
           </div>
@@ -40,17 +40,7 @@ export default function Approve() {
             </Agree>
           )}
         </div>
-        <div className="col w-only">
-          <div className="gcard" style={{ background: "var(--ground)" }}>
-            <b style={{ fontWeight: 500, fontSize: 18 }}>What you agree to</b>
-            <div className="keys" style={{ marginTop: 8 }}>
-              <div><i>✓</i>{kid} gets their own account, linked to you</div>
-              <div><i>✓</i>We store a name, birth date, level and study progress</div>
-              <div><i>✓</i>You can reset their password or close the account any time</div>
-              <div><i>✓</i>If nobody approves in 7 days, the account is paused</div>
-            </div>
-          </div>
-        </div>
+        <div className="col w-only"><Art kind="approve" /></div>
       </div>
       {!done && (
         <div className="cta">

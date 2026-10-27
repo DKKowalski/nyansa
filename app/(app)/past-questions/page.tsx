@@ -12,10 +12,8 @@ export default function PastQuestions() {
   return (
     <div className="scr">
       <div className="top"><BackLink href="/practice" /><div className="grow" /><button type="button" className="cbtn" aria-label="Search" onClick={() => toast("Search comes later")}><I.search /></button></div>
-      <p className="hello">Mathematics · WAEC BECE</p>
       <h1 className="h-xl">Past questions</h1>
       <div className="chips">
-        <span className="chip icon"><I.filter /></span>
         {["Linear equations", "All years", "Paper 1", "Paper 2"].map((x, i) => <button key={x} type="button" className="chip" aria-pressed={i === 0} onClick={() => toast("Filters come in the build")}>{x}</button>)}
       </div>
       <div className="grid2">

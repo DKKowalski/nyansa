@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Art } from "@/components/art";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BusyButton, Segmented } from "@/components/motion";
@@ -38,7 +39,6 @@ export default function SignIn() {
       <div className="top"><BackLink href="/welcome" /><div className="grow" /></div>
       <div className="cols obc">
         <div className="col">
-          <p className="hello">Welcome back</p>
           <h1 className="h-xl">Sign in</h1>
           <button type="button" className="btn light" onClick={() => toast("Google sign-in comes later")}><I.google />Continue with Google</button>
           <OrDivider />
@@ -55,16 +55,7 @@ export default function SignIn() {
           </button>
           <p className="small">Prototype: <button type="button" className="linkbtn" onClick={sample}>sign in as the sample student Ama</button>.</p>
         </div>
-        <div className="col w-only">
-          <div className="gcard" style={{ background: "var(--ground)" }}>
-            <b style={{ fontWeight: 500, fontSize: 18 }}>Who signs in how</b>
-            <div className="keys" style={{ marginTop: 8 }}>
-              <div><i>U</i>Every student: the username and password they chose, or got from a parent</div>
-              <div><i>P</i>Students 18 or over: also their phone number or email</div>
-              <div><i>G</i>Parents: their phone number and password</div>
-            </div>
-          </div>
-        </div>
+        <div className="col w-only"><Art kind="signin" /></div>
       </div>
       <div className="cta">
         <BusyButton busyLabel="Signing in…" disabled={!v || !pass}

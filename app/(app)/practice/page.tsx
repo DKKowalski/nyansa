@@ -15,7 +15,6 @@ export default function PracticeHub() {
   return (
     <div className="scr">
       <PhoneTop />
-      <p className="hello">Practice</p>
       <h1 className="h-xl">Get exam-ready</h1>
       <div className="hero">
         <span className="live">CONTINUE</span><h3>Linear equations · Set 2</h3>

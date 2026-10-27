@@ -17,7 +17,7 @@ export default function Results() {
   return (
     <div className="scr">
       <div className="top">
-        <div className="grow"><p className="hello" style={{ margin: 0 }}>Maths starting point</p></div>
+        <div className="grow"><h1 className="h-l">Maths starting point</h1></div>
         <button type="button" className="cbtn" aria-label="Share" onClick={() => toast("Sharing comes later")}><I.up /></button>
       </div>
       <div className="cols obc">

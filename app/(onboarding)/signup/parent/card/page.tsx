@@ -33,7 +33,6 @@ export default function LoginCard() {
       <SetupTop />
       <div className="cols obc">
         <div className="col">
-          <p className="hello">{name}&apos;s login</p>
           <h1 className="h-xl">Pick a fun username</h1>
           <p className="lead">Let {name} choose. It never shows their real name.</p>
           <div style={{ display: "grid", gap: 8 }}>

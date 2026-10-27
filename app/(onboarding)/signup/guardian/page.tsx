@@ -1,10 +1,11 @@
 "use client";
 import { useState } from "react";
+import { Art } from "@/components/art";
 import { Segmented } from "@/components/motion";
-import { SetupTop, SmsBox, useNextStep } from "@/components/shells";
+import { SetupTop, useNextStep } from "@/components/shells";
 import { Agree, Hint, PhoneField, TermsLinks } from "@/components/ui";
 import { contactOk, isEmail, type Contact, type Guardian as G } from "@/lib/account";
-import { firstName, useApp } from "@/lib/store";
+import { useApp } from "@/lib/store";
 
 const RELATIONS = ["Mother", "Father", "Guardian", "Other relative"];
 
@@ -24,7 +25,6 @@ export default function Guardian() {
       <SetupTop />
       <div className="cols obc">
         <div className="col">
-          <p className="hello">Because you&apos;re under 18</p>
           <h1 className="h-xl">Your parent or guardian</h1>
           <p className="lead">They agree for you. We&apos;ll send them a code to confirm, and a weekly report on how you&apos;re doing.</p>
           <input className="input" autoComplete="off" aria-label="Parent or guardian's full name" placeholder="Their full name, e.g. Akosua Mensah" value={g.name} onChange={(e) => put({ name: e.target.value })} />
@@ -43,17 +43,7 @@ export default function Guardian() {
             <b>{who === "your parent" ? "My parent or guardian agrees" : `${who} agrees`}</b>, on my behalf, to Nyansa&apos;s <TermsLinks />. I&apos;m under 18, so ticking this means they are agreeing for me.
           </Agree>
         </div>
-        <div className="col w-only">
-          <SmsBox got={false} parent email={g.via === "email"} />
-          <div className="gcard" style={{ background: "var(--ground)" }}>
-            <b style={{ fontWeight: 500, fontSize: 18 }}>What {who} agrees to</b>
-            <div className="keys" style={{ marginTop: 8 }}>
-              <div><i>✓</i>{firstName(s.name)} gets their own account, linked to {who}</div>
-              <div><i>✓</i>We store a name, birth date, level and study progress, nothing more</div>
-              <div><i>✓</i>{who === "your parent" ? "They" : who} can reset the password or close the account any time</div>
-            </div>
-          </div>
-        </div>
+        <div className="col w-only"><Art kind="guardian" /></div>
       </div>
       <div className="cta">
         <button type="button" className="btn" disabled={!ready}

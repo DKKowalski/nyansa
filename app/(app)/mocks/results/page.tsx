@@ -22,7 +22,7 @@ export default function MockResults() {
   return (
     <div className="scr">
       <div className="top"><BackLink href="/mocks" /><div className="grow" /><button type="button" className="cbtn" aria-label="Share" onClick={() => toast("Sharing comes later")}><I.up /></button></div>
-      <p className="hello">BECE Maths Mock 1 · results</p>
+      <h1 className="h-l">Maths Mock 1 results</h1>
       <div className="cols">
         <div className="col">
           <div className="gcard"><span className="small" style={{ color: "var(--ink-2)" }}>Your grade (1 is best)</span><div className="big"><b><Num value={gr} from={9} /></b><span><Num value={tot} from={0} /> of 100 marks<br />Target: grade 1</span></div></div>

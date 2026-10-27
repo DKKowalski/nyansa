@@ -6,7 +6,7 @@ import { PhoneTop } from "@/components/shells";
 import { Gauge, StrandRow, Trend } from "@/components/viz";
 import { Num, Segmented } from "@/components/motion";
 import { PQ } from "@/lib/content";
-import { examName, firstName, useApp } from "@/lib/store";
+import { useApp } from "@/lib/store";
 
 const WEEK: [string, number][] = [["Mon", 20], ["Tue", 35], ["Wed", 0], ["Thu", 30], ["Fri", 45], ["Sat", 25], ["Sun", 10]];
 const ACTIVITY = [
@@ -18,14 +18,13 @@ const ACTIVITY = [
 
 /** R1 Progress: predicted grade trend, study time, mastery, strengths and weaknesses, recent activity. */
 export default function Progress() {
-  const { name, exam, pans, psetDone } = useApp();
+  const { pans, psetDone } = useApp();
   // The set the student just did, if any; otherwise the sample history.
   const set2 = psetDone ? `${PQ.filter((q, i) => pans[i] === q.a).length}/${PQ.length}` : "4/5";
   const [range, setRange] = useState(0);
   return (
     <div className="scr">
       <PhoneTop><Link className="cbtn" href="/settings" aria-label="Settings"><I.settings /></Link></PhoneTop>
-      <p className="hello">{firstName(name)} · {examName(exam)}</p>
       <h1 className="h-xl">Your progress</h1>
       <Segmented label="Range" style={{ maxWidth: 420 }} value={range} onChange={setRange}
         options={["Week", "Month", "All time"].map((x, i) => ({ value: i, label: x }))} />

@@ -1,7 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
+import { Art } from "@/components/art";
 import { BusyButton, haptic } from "@/components/motion";
-import { SetupTop, SmsBox, useNextStep } from "@/components/shells";
+import { SetupTop, useNextStep } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { isMinor } from "@/lib/account";
 import { formatGhana } from "@/lib/phone";
@@ -44,9 +45,8 @@ export default function Verify() {
       <SetupTop />
       <div className="cols obc">
         <div className="col">
-          <p className="hello">{forParent ? `Ask ${who} for the code` : "Check your messages"}</p>
           <h1 className="h-xl">Enter the code</h1>
-          <p className="lead">{forParent ? `We sent it to ${who}'s ${via === "email" ? "email" : "phone"}: ` : "Sent to "}<span className="nowrap">{dest}</span></p>
+          <p className="lead">{forParent ? `Ask ${who} for the code we sent to their ${via === "email" ? "email" : "phone"}: ` : "Sent to "}<span className="nowrap">{dest}</span></p>
           <div className={`otp${ok ? " done" : ""}`}>
             {code.map((d, i) => (
               <input key={i} ref={(el) => { refs.current[i] = el; }} className="input" inputMode="numeric" autoComplete={i === 0 ? "one-time-code" : "off"}
@@ -63,7 +63,7 @@ export default function Verify() {
             </div>
           )}
         </div>
-        <div className="col w-only"><SmsBox got parent={forParent} email={via === "email"} /></div>
+        <div className="col w-only"><Art kind="code" /></div>
       </div>
       <div className="cta">
         <BusyButton busyLabel="Checking…" wait={600} disabled={!ok} onDone={() => { if (forParent) s.set({ approval: "verified" }); next(); }}>Verify</BusyButton>

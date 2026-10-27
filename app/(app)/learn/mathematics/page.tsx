@@ -51,10 +51,8 @@ export default function Journey() {
   return (
     <div className="scr">
       <div className="top"><BackLink href="/learn" /><div className="grow" /><button type="button" className="cbtn" aria-label="Search" onClick={() => toast("Search comes later")}><I.search /></button></div>
-      <p className="hello">Mathematics · BECE</p>
       <h1 className="h-xl">Your journey</h1>
       <div className="chips">
-        <span className="chip icon"><I.filter /></span>
         {["All units", "Number", "Algebra", "Geometry", "Data"].map((x, i) => <button key={x} type="button" className="chip" aria-pressed={i === 0} onClick={() => toast("Filtering by strand comes later")}>{x}</button>)}
       </div>
       <div className="cols">

@@ -1,7 +1,8 @@
 "use client";
 import { I } from "@/components/icons";
+import { Art } from "@/components/art";
 import { BusyButton, Segmented } from "@/components/motion";
-import { SetupTop, SmsBox, useNextStep } from "@/components/shells";
+import { SetupTop, useNextStep } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { Agree, Hint, OrDivider, PhoneField, TermsLinks } from "@/components/ui";
 import { contactOk, isEmail, optionalOk, type Contact as C } from "@/lib/account";
@@ -26,7 +27,6 @@ export default function Contact() {
       <SetupTop />
       <div className="cols obc">
         <div className="col">
-          <p className="hello">Your account</p>
           <h1 className="h-xl">How should we reach you?</h1>
           <p className="lead">We&apos;ll send a 6-digit code to check it&apos;s yours. You can also sign in with it.</p>
           <button type="button" className="btn light" onClick={() => toast("Google sign-in comes later")}><I.google />Continue with Google</button>
@@ -50,7 +50,7 @@ export default function Contact() {
             I&apos;m 18 or over and I agree to Nyansa&apos;s <TermsLinks />.
           </Agree>
         </div>
-        <div className="col w-only"><SmsBox got={false} email={contact === "email"} /></div>
+        <div className="col w-only"><Art kind="contact" /></div>
       </div>
       <div className="cta">
         <BusyButton busyLabel="Sending code…" disabled={!ok || !agreed} onDone={() => { set({ guardian: null, approval: "none" }); next(); }}>Send code</BusyButton>

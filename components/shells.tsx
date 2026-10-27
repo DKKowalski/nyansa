@@ -168,24 +168,3 @@ export function SetupTop() {
     </div>
   );
 }
-
-/** The message preview beside the contact and code steps on web: an SMS, or an email. */
-export function SmsBox({ got, email = false, parent = false }: { got: boolean; email?: boolean; parent?: boolean }) {
-  const chip = { background: "rgba(255,255,255,.08)", color: "#fff", borderColor: "rgba(255,255,255,.18)" };
-  return (
-    <div className="smsbox">
-      <div className="smshd"><span>{email ? "Inbox" : "Messages"}{parent ? " · your parent's phone" : ""}</span><span>now</span></div>
-      <div className="smsfrom"><span className="av" style={{ width: 40, height: 40, fontSize: 14, background: "var(--forest)", color: "var(--gold)" }}>N</span><b>NYANSA</b></div>
-      <div className="smsb">
-        {parent ? "Your child wants to join Nyansa. If you agree, give them this code: " : "Your Nyansa code is "}
-        <b className={got ? "hl" : ""}>482 916</b>. It expires in 10 minutes.{parent ? "" : " Don't share it with anyone."}
-      </div>
-      {got && <span className="lvl" style={{ justifySelf: "start", background: "var(--sage)", borderColor: "transparent", color: "var(--ink)" }}>✓ Code received</span>}
-      <div className="chips" style={{ margin: "6px 0 0", padding: 0, flexWrap: "wrap" }}>
-        {email
-          ? <><span className="chip" style={chip}>No phone needed</span><span className="chip" style={chip}>Check your spam folder</span></>
-          : <><span className="chip" style={chip}>No email needed</span><span className="chip" style={chip}>Works on any phone</span></>}
-      </div>
-    </div>
-  );
-}

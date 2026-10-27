@@ -46,7 +46,6 @@ export default function Tutor() {
   return (
     <div className="scr tutorpage">
       <div className="w-only pagehead">
-        <p className="hello">{q ? "Maths · Linear equations" : "Any subject · hints first"}</p>
         <h1 className="h-xl">Ask the tutor</h1>
       </div>
       <div className="cols">

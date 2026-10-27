@@ -22,7 +22,7 @@ export default function Home() {
         <button type="button" className="cbtn" aria-label="Notifications" onClick={() => toast("No new notifications")}><I.bell /></button>
       </PhoneTop>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
-        <div style={{ flex: 1 }}><p className="hello">{greeting(s.now)},</p><h1 className="h-xl" style={{ marginTop: 8 }}>{firstName(s.name)}</h1></div>
+        <div style={{ flex: 1 }}><h1 className="h-xl">{greeting(s.now)}, {firstName(s.name)}</h1></div>
         <div className="streak"><span style={{ color: "var(--clay)", gridRow: "span 2" }}><I.flame width={22} height={22} /></span><b>1</b><span>Day</span></div>
       </div>
       {s.approval === "pending" && (

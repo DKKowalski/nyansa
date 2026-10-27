@@ -21,7 +21,6 @@ export default function Class() {
       <SetupTop />
       <div className="cols obc">
         <div className="col">
-          <p className="hello">{examName(exam)}</p>
           <h1 className="h-xl">Which class are you in?</h1>
           <p className="lead">{primary ? "We'll build the foundations you need for JHS and the BECE." : "So we match the syllabus to where you are."}</p>
           <div className="chips" style={{ flexWrap: "wrap" }}>

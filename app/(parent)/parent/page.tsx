@@ -20,11 +20,10 @@ export default function ParentHome() {
   return (
     <div className="scr">
       <div className="top m-only"><Avatar parent /><div className="grow" /><button type="button" className="cbtn" aria-label="Notifications" onClick={() => toast("No new messages")}><I.bell /></button></div>
-      <p className="hello">Weekly report · 6–12 Oct</p>
       <h1 className="h-xl">Ama&apos;s week</h1>
       <div className="cols">
         <div className="col">
-          <div className="hero"><span className="live">IN PLAIN WORDS</span><h3 style={{ fontSize: 22, fontWeight: 400, lineHeight: 1.35 }}>Ama studied 2 hours 45 minutes this week. Her Maths moved up from grade 5 to grade 4. She needs more work on English comprehension.</h3></div>
+          <div className="hero"><span className="live">6–12 OCT</span><h3 style={{ fontSize: 22, fontWeight: 400, lineHeight: 1.35 }}>Ama studied 2 hours 45 minutes this week. Her Maths moved up from grade 5 to grade 4. She needs more work on English comprehension.</h3></div>
           <div className="duo">
             <div className="stat bg-sage"><div className="tp">Days active</div><div className="v"><b>5</b><span>of 7</span></div></div>
             <div className="stat bg-butter"><div className="tp">Maths grade</div><div className="v"><b>4</b><span>was 5</span></div></div>

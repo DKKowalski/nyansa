@@ -2,7 +2,7 @@
 import { Deco, I } from "@/components/icons";
 import { SetupTop, useNextStep } from "@/components/shells";
 import type { Exam as ExamT } from "@/lib/content";
-import { firstName, useApp } from "@/lib/store";
+import { useApp } from "@/lib/store";
 
 const EXAMS: { v: ExamT; bg: string; k: string; n: string; facts: string[] }[] = [
   { v: "BECE", bg: "bg-sage", k: "End of JHS", n: "Basic Education Certificate Exam", facts: ["Written in June", "Grades 1 to 9", "Ends JHS"] },
@@ -12,11 +12,10 @@ const EXAMS: { v: ExamT; bg: string; k: string; n: string; facts: string[] }[] =
 /** A3 Choose exam. */
 export default function Exam() {
   const next = useNextStep();
-  const { exam, name, set } = useApp();
+  const { exam, set } = useApp();
   return (
     <div className="scr">
       <SetupTop />
-      <p className="hello">Hello, {firstName(name)}</p>
       <h1 className="h-xl">Which exam are you writing?</h1>
       <div className="grid2 examgrid">
         {EXAMS.map(({ v, bg, k, n, facts }) => (

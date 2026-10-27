@@ -15,7 +15,6 @@ export default function LinkChild() {
   return (
     <div className="scr">
       <div className="top"><BackLink href={parentSignup ? "/signup/parent/name" : "/settings"} /><div className="grow" /></div>
-      <p className="hello">Parent or guardian</p>
       <h1 className="h-xl">Link your child</h1>
       <p className="lead">Ask your child for the 6-digit code in their Nyansa settings.</p>
       <div className="otp6 stagger">{"482916".split("").map((d, i) => <span key={i}>{d}</span>)}</div>

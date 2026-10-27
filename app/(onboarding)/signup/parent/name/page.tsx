@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { SetupTop, SmsBox, useNextStep } from "@/components/shells";
+import { Art } from "@/components/art";
+import { SetupTop, useNextStep } from "@/components/shells";
 import { Hint, PasswordField, PasswordRules } from "@/components/ui";
 import { passwordProblem } from "@/lib/account";
 import { useApp } from "@/lib/store";
@@ -16,14 +17,13 @@ export default function ParentName() {
       <SetupTop />
       <div className="cols obc">
         <div className="col">
-          <p className="hello">Parent account</p>
           <h1 className="h-xl">Your name and password</h1>
           <input className="input" autoComplete="name" aria-label="Your name" placeholder="Your name, e.g. Akosua Mensah" value={name} onChange={(e) => set({ name: e.target.value })} />
           <PasswordField value={pass} onChange={setPass} />
           <PasswordRules value={pass} />
           <Hint>You&apos;ll sign in with your phone number and this password. Lost it? We text you a code.</Hint>
         </div>
-        <div className="col w-only"><SmsBox got /></div>
+        <div className="col w-only"><Art kind="username" /></div>
       </div>
       <div className="cta">
         <button type="button" className="btn" disabled={!name.trim() || !pass || !!problem} onClick={() => next()}>Continue</button>

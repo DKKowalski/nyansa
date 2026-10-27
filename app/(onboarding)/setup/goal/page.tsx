@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Segmented } from "@/components/motion";
 import { I } from "@/components/icons";
 import { SetupTop, useNextStep } from "@/components/shells";
-import { daysLeft, examDate, examName, useApp } from "@/lib/store";
+import { daysLeft, examDate, useApp } from "@/lib/store";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const WEEK: [string, number][] = [["M", 1], ["T", 1], ["W", 0.6], ["T", 1], ["F", 1], ["S", 1.4], ["S", 0.4]];
@@ -24,7 +24,6 @@ export default function Goal() {
   return (
     <div className="scr">
       <SetupTop />
-      <p className="hello">{examName(s.exam)} · {left} days away</p>
       <h1 className="h-l">Exam date and daily goal</h1>
       <div className="cols obc">
         <div className="col">

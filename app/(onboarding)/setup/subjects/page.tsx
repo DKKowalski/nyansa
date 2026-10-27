@@ -16,9 +16,8 @@ export default function Subjects() {
       <SetupTop />
       <div className="cols obc">
         <div className="col">
-          <p className="hello">Your subjects</p>
           <h1 className="h-xl">Your custom syllabus</h1>
-          <div className="chips"><span className="chip icon"><I.filter /></span><span className="chip">Core <span className="x">✕</span></span><span className="chip" style={{ opacity: 0.5 }}>Electives · later</span></div>
+          <p className="lead">The 4 core subjects. Electives come later.</p>
           <div className="grid2">
             {CORE.map(({ name, abbr, bg }) => {
               const on = sel.includes(name);

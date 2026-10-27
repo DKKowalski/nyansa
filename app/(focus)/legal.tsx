@@ -6,7 +6,6 @@ export function LegalPage({ title, points }: { title: string; points: [string, s
   return (
     <div className="scr">
       <div className="top"><Link className="cbtn" href="/welcome" aria-label="Close"><I.close /></Link><div className="grow" /></div>
-      <p className="hello">Nyansa</p>
       <h1 className="h-xl">{title}</h1>
       <div className="pcard bg-butter" style={{ cursor: "default" }}><span className="k">Draft summary. The full, reviewed text will be published here before launch.</span></div>
       <div className="gcard legal">

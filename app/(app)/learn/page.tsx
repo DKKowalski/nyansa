@@ -4,7 +4,7 @@ import { Deco, I } from "@/components/icons";
 import { PhoneTop } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { subjectByName } from "@/lib/content";
-import { correctCount, examName, gradeOf, subjectsOf, useApp } from "@/lib/store";
+import { correctCount, gradeOf, subjectsOf, useApp } from "@/lib/store";
 
 /** L1 Subjects: pastel cards with mastery and predicted grade. Mathematics carries the sample content. */
 export default function Learn() {
@@ -14,9 +14,8 @@ export default function Learn() {
   return (
     <div className="scr">
       <PhoneTop><button type="button" className="cbtn" aria-label="Search" onClick={() => toast("Search comes later")}><I.search /></button></PhoneTop>
-      <p className="hello">{examName(s.exam)} · {subs.length} subjects</p>
       <h1 className="h-xl">Your subjects</h1>
-      <div className="chips"><span className="chip icon"><I.filter /></span><span className="chip" aria-pressed="true">Core</span><span className="chip" style={{ opacity: 0.5 }}>Electives · later</span></div>
+      <p className="lead">{subs.length} core subjects. Electives come later.</p>
       <div className="grid2">
         {subs.map((n) => {
           const c = subjectByName(n), isM = n === "Mathematics";

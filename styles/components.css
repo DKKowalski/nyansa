@@ -609,3 +609,9 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 .legal ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ===== illustrations: side cards on sign-up screens, welcome slides ===== */
+.art { border-radius: 32px; overflow: hidden; background: var(--sage); aspect-ratio: 5 / 6; width: 100%; }
+.art svg { display: block; width: 100%; height: 100%; }
+.slideart { width: 100%; height: 100%; display: block; }
+.welcome .wart { display: grid; place-items: center; }
