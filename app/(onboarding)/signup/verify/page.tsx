@@ -46,7 +46,7 @@ export default function Verify() {
         <div className="col">
           <p className="hello">{forParent ? `Ask ${who} for the code` : "Check your messages"}</p>
           <h1 className="h-xl">Enter the code</h1>
-          <p className="lead">{forParent ? `We sent it to ${who}'s ${via === "email" ? "email" : "phone"}: ${dest}` : `Sent to ${dest}`}</p>
+          <p className="lead">{forParent ? `We sent it to ${who}'s ${via === "email" ? "email" : "phone"}: ` : "Sent to "}<span className="nowrap">{dest}</span></p>
           <div className={`otp${ok ? " done" : ""}`}>
             {code.map((d, i) => (
               <input key={i} ref={(el) => { refs.current[i] = el; }} className="input" inputMode="numeric" autoComplete={i === 0 ? "one-time-code" : "off"}

@@ -136,6 +136,24 @@ export function PasswordField({ value, onChange, label = "Password", placeholder
 }
 
 /** A small hint under a field: red when something is wrong. */
-export function Hint({ error, children }: { error?: boolean; children: React.ReactNode }) {
-  return <p className="small" aria-live="polite" style={{ margin: 0, ...(error ? { color: "#9A3A20" } : {}) }}>{children}</p>;
+export function Hint({ error, ok, children }: { error?: boolean; ok?: boolean; children: React.ReactNode }) {
+  return <p className={`small hint${error ? " err" : ok ? " ok" : ""}`} aria-live="polite">{children}</p>;
 }
+
+/** Password rules that tick as they are met, so nobody has to guess what "too weak" means. */
+export function PasswordRules({ value, username = "" }: { value: string; username?: string }) {
+  const rules: [string, boolean][] = [
+    ["8+ characters", value.length >= 8],
+    ["A letter", /[a-z]/i.test(value)],
+    ["A number", /\d/.test(value)],
+    ...(username.trim() ? [["Not your username", !!value && !value.toLowerCase().includes(username.trim().toLowerCase())] as [string, boolean]] : []),
+  ];
+  return (
+    <ul className="pwrules" aria-label="Password rules">
+      {rules.map(([l, met]) => <li key={l} className={met ? "met" : ""}><span aria-hidden="true">{met ? <I.check /> : null}</span>{l}<span className="sr-only">{met ? " (done)" : ""}</span></li>)}
+    </ul>
+  );
+}
+
+/** "or" between a one-tap option and the form. */
+export const OrDivider = () => <div className="today" role="separator">or</div>;

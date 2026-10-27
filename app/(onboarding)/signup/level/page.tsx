@@ -13,15 +13,16 @@ export default function Level() {
       <SetupTop />
       <p className="hello">Create your account</p>
       <h1 className="h-xl">What level are you at?</h1>
-      <p className="lead">So your lessons match where you are in school.</p>
+      <p className="lead">So your lessons match where you are in school. You can change it later.</p>
       <div className="grid2 levelgrid">
-        {LEVELS.map(({ v, bg, n, k }) => (
+        {LEVELS.map(({ v, bg, n, k, tag }) => (
           <button key={v} type="button" className={`pcard ${bg}`} aria-pressed={level === v}
             onClick={() => { set({ level: v, role: "student", date: "", ...(level === v ? {} : levelDefaults(v)) }); next(); }}>
             <Deco />
+            <span className="tag">{tag}</span>
             <span className="ico"><I.cap /></span>
             <span className="n">{n}</span>
-            <span className="k" style={{ paddingRight: 60 }}>{k}</span>
+            <span className="k">{k}</span>
             <span className="go">{level === v ? <I.check /> : <I.arrow />}</span>
           </button>
         ))}

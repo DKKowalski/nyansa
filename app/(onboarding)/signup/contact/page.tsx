@@ -3,7 +3,7 @@ import { I } from "@/components/icons";
 import { BusyButton, Segmented } from "@/components/motion";
 import { SetupTop, SmsBox, useNextStep } from "@/components/shells";
 import { useToast } from "@/components/toast";
-import { Agree, Hint, PhoneField, TermsLinks } from "@/components/ui";
+import { Agree, Hint, OrDivider, PhoneField, TermsLinks } from "@/components/ui";
 import { contactOk, isEmail, optionalOk, type Contact as C } from "@/lib/account";
 import { useApp } from "@/lib/store";
 
@@ -29,25 +29,26 @@ export default function Contact() {
           <p className="hello">Your account</p>
           <h1 className="h-xl">How should we reach you?</h1>
           <p className="lead">We&apos;ll send a 6-digit code to check it&apos;s yours. You can also sign in with it.</p>
+          <button type="button" className="btn light" onClick={() => toast("Google sign-in comes later")}><I.google />Continue with Google</button>
+          <OrDivider />
           <Segmented label="Sign up with" value={contact} onChange={(v: C) => set({ contact: v })}
             options={[{ value: "phone", label: "Phone number" }, { value: "email", label: "Email" }]} />
           {contact === "phone" ? (
             <>
               <PhoneField value={phone} onChange={(v) => set({ phone: v })} autoFocus />
-              <div className="sec"><h3 style={{ fontSize: 17 }}>Email <span className="small">· optional</span></h3></div>
+              <span className="optlabel">Email <span>· optional</span></span>
               {emailField(true)}
             </>
           ) : (
             <>
               {emailField(false)}
-              <div className="sec"><h3 style={{ fontSize: 17 }}>Phone number <span className="small">· optional</span></h3></div>
+              <span className="optlabel">Phone number <span>· optional</span></span>
               <PhoneField label="Phone number (optional)" value={phone} onChange={(v) => set({ phone: v })} note="Handy for SMS reminders. We never share it." />
             </>
           )}
           <Agree checked={agreed} onChange={(v) => set({ consent: v ? { by: "self", at: Date.now() } : null })}>
             I&apos;m 18 or over and I agree to Nyansa&apos;s <TermsLinks />.
           </Agree>
-          <button type="button" className="btn light" onClick={() => toast("Google sign-in comes later")}><I.google />Continue with Google instead</button>
         </div>
         <div className="col w-only"><SmsBox got={false} email={contact === "email"} /></div>
       </div>

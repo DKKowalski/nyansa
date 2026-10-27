@@ -9,11 +9,11 @@ export type Approval = "none" | "verified" | "pending" | "approved";
 
 export interface Guardian { name: string; relation: string; via: Contact; phone: string; email: string }
 
-export const LEVELS: { v: Level; bg: string; n: string; k: string }[] = [
-  { v: "primary", bg: "bg-butter", n: "Primary", k: "Class 4 to 6, getting ready for JHS" },
-  { v: "jhs", bg: "bg-sage", n: "JHS", k: "JHS 1 to 3, preparing for the BECE" },
-  { v: "shs", bg: "bg-lilac", n: "SHS", k: "SHS 1 to 3, preparing for the WASSCE" },
-  { v: "tertiary", bg: "bg-clay", n: "Tertiary", k: "University, college or re-sitting an exam" },
+export const LEVELS: { v: Level; bg: string; n: string; k: string; tag: string }[] = [
+  { v: "primary", bg: "bg-butter", n: "Primary", k: "Class 4 to 6", tag: "BECE basics" },
+  { v: "jhs", bg: "bg-sage", n: "JHS", k: "JHS 1 to 3", tag: "BECE" },
+  { v: "shs", bg: "bg-lilac", n: "SHS", k: "SHS 1 to 3", tag: "WASSCE" },
+  { v: "tertiary", bg: "bg-clay", n: "Tertiary", k: "University or re-sitting", tag: "Your choice" },
 ];
 export const levelName = (l: Level | null) => LEVELS.find((x) => x.v === l)?.n ?? "";
 

@@ -4,7 +4,7 @@ import { I } from "@/components/icons";
 import { BusyButton } from "@/components/motion";
 import { SetupTop, SmsBox } from "@/components/shells";
 import { useToast } from "@/components/toast";
-import { Agree, PhoneField, TermsLinks } from "@/components/ui";
+import { Agree, OrDivider, PhoneField, TermsLinks } from "@/components/ui";
 import { isGhanaMobile } from "@/lib/phone";
 import { useApp } from "@/lib/store";
 
@@ -22,11 +22,12 @@ export default function ParentStart() {
           <p className="hello">For parents and guardians</p>
           <h1 className="h-xl">Create your parent account</h1>
           <p className="lead">You&apos;ll add your children next. Each child gets their own login.</p>
-          <PhoneField value={phone} onChange={(v) => set({ phone: v, role: "parent" })} autoFocus note="We text you a 6-digit code once. We use it for weekly reports and to recover your account." />
+          <button type="button" className="btn light" onClick={() => toast("Google sign-in comes later")}><I.google />Continue with Google</button>
+          <OrDivider />
+          <PhoneField value={phone} onChange={(v) => set({ phone: v, role: "parent" })} note="We text you a 6-digit code once. We use it for weekly reports and to recover your account." />
           <Agree checked={agreed} onChange={(v) => set({ consent: v ? { by: "self", at: Date.now() } : null })}>
             I agree to Nyansa&apos;s <TermsLinks />, for myself and for the children I add.
           </Agree>
-          <button type="button" className="btn light" onClick={() => toast("Google sign-in comes later")}><I.google />Continue with Google instead</button>
         </div>
         <div className="col w-only">
           <div className="gcard">

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { BusyButton } from "@/components/motion";
 import { SetupTop, useNextStep } from "@/components/shells";
-import { Hint, PasswordField } from "@/components/ui";
+import { Hint, PasswordField, PasswordRules } from "@/components/ui";
 import { FIRST_USERNAMES, isMinor, passwordProblem, suggestUsernames, usernameProblem } from "@/lib/account";
 import { firstName, useApp } from "@/lib/store";
 
@@ -32,15 +32,15 @@ export default function Username() {
             value={user} onChange={(e) => setUser(e.target.value.replace(/\s/g, ""))} />
           {uProblem && !realName ? <Hint error>{uProblem}</Hint>
             : realName ? <Hint error={minor}>{minor ? "Don't use your real name. Pick a fun one so you stay private." : "Tip: a username without your real name keeps you more private."}</Hint>
-            : user.trim() ? <Hint>✓ {user.trim()} is free</Hint>
+            : user.trim() ? <Hint ok>✓ {user.trim()} is free</Hint>
             : <Hint>4 to 20 letters or numbers. Or tap one of these:</Hint>}
-          <div className="sugs">
+          <div className="chips sugs">
             {sugs.map((x) => <button key={x.u} type="button" className="chip" aria-pressed={user === x.u} onClick={() => setUser(x.u)}><span aria-hidden="true">{x.av}</span>{x.u}</button>)}
             <button type="button" className="chip" onClick={() => setSugs(suggestUsernames(3))}>Shuffle</button>
           </div>
           <div className="sec"><h3>Password</h3></div>
           <PasswordField value={pass} onChange={setPass} />
-          {pProblem ? <Hint error>{pProblem}</Hint> : <Hint>{pass ? "✓ Good password" : "At least 8 characters, with letters and a number."}</Hint>}
+          <PasswordRules value={pass} username={user} />
         </div>
         <div className="col w-only">
           <div className="tcard bg-forest logincard">

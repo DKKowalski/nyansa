@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { SetupTop, SmsBox, useNextStep } from "@/components/shells";
-import { Hint, PasswordField } from "@/components/ui";
+import { Hint, PasswordField, PasswordRules } from "@/components/ui";
 import { passwordProblem } from "@/lib/account";
 import { useApp } from "@/lib/store";
 
@@ -20,7 +20,8 @@ export default function ParentName() {
           <h1 className="h-xl">Your name and password</h1>
           <input className="input" autoComplete="name" aria-label="Your name" placeholder="Your name, e.g. Akosua Mensah" value={name} onChange={(e) => set({ name: e.target.value })} />
           <PasswordField value={pass} onChange={setPass} />
-          {problem ? <Hint error>{problem}</Hint> : <Hint>You&apos;ll sign in with your phone number and this password. Lost it? We text you a code.</Hint>}
+          <PasswordRules value={pass} />
+          <Hint>You&apos;ll sign in with your phone number and this password. Lost it? We text you a code.</Hint>
         </div>
         <div className="col w-only"><SmsBox got /></div>
       </div>

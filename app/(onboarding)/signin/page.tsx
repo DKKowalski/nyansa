@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { BusyButton, Segmented } from "@/components/motion";
 import { BackLink } from "@/components/shells";
 import { useToast } from "@/components/toast";
-import { Hint, PasswordField } from "@/components/ui";
+import { Hint, OrDivider, PasswordField } from "@/components/ui";
+import { I } from "@/components/icons";
 import { ghanaDigits } from "@/lib/phone";
 import { useApp } from "@/lib/store";
 
@@ -39,6 +40,8 @@ export default function SignIn() {
         <div className="col">
           <p className="hello">Welcome back</p>
           <h1 className="h-xl">Sign in</h1>
+          <button type="button" className="btn light" onClick={() => toast("Google sign-in comes later")}><I.google />Continue with Google</button>
+          <OrDivider />
           <Segmented label="Sign in with" value={tab} onChange={(t: Tab) => { setTab(t); setId(""); setFailed(false); }}
             options={[{ value: "user", label: "Username" }, { value: "contact", label: "Phone or email" }]} />
           <input className="input" autoComplete={tab === "user" ? "username" : "email"} autoCapitalize="none" spellCheck={false}
@@ -46,7 +49,7 @@ export default function SignIn() {
             value={id} onChange={(e) => { setId(e.target.value); setFailed(false); }} />
           <PasswordField value={pass} onChange={(p) => { setPass(p); setFailed(false); }} placeholder="Password" autoComplete="current-password" />
           {failed && <Hint error>That doesn&apos;t match an account on this device. Check the spelling and try again.</Hint>}
-          <button type="button" className="linkbtn" style={{ justifySelf: "start" }}
+          <button type="button" className="linkbtn" style={{ alignSelf: "flex-start" }}
             onClick={() => toast(tab === "user" ? "Under 18? Ask your parent to reset it. Otherwise sign in with your phone or email." : "We'll send a code so you can set a new password.")}>
             Forgot your password?
           </button>
