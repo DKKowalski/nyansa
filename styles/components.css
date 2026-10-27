@@ -232,6 +232,13 @@
 .wnav .dots i.on { width: 40px; height: 6px; background: var(--ink); }
 .wnext { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--ink); color: #fff; display: grid; place-items: center; cursor: pointer; position: relative; }
 .wnext svg { width: 24px; height: 24px; }
+.wnext.ghost { width: 52px; height: 52px; background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px rgba(20,24,22,.18); }
+.wbtns { display: flex; align-items: center; gap: 10px; }
+.wnav .dots { gap: 0; }
+.wdot { border: 0; background: none; padding: 12px 3px; cursor: pointer; display: flex; touch-action: manipulation; }
+.wdot:hover i:not(.on) { background: #B5B9B1; }
+.wdot:focus-visible { outline: 3px solid var(--gold); outline-offset: 0; border-radius: 6px; }
+.welcome .wgrid { touch-action: pan-y; }
 
 /* ===== responsive shells (web first, phone kept) ===== */
 .auth, .shell { flex: 1; display: flex; min-height: 0; position: relative; }
