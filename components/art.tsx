@@ -1,238 +1,317 @@
-import { useId } from "react";
 import { KnotMark } from "./brand";
 
-/** Illustrations in the style of Uber's brand art: flat shapes, no outlines, faceless people with long limbs,
- *  big hands and feet and small heads, oversized everyday objects, flat shadows and a light grain.
- *  Drawn as SVG so they stay sharp and weigh almost nothing on a phone data plan. */
+/** Spot illustrations in the manner of the Uber app's product art: everyday objects in a three-quarter view,
+ *  flat fills with hard edges, each surface shaded in three tones (lit top, mid left face, dark right face),
+ *  a warm palette with one cool accent, and no gradients. Drawn in code from a small isometric helper so the
+ *  light is the same on every object, and they weigh almost nothing on a phone data plan. */
 
-const C = {
-  forest: "#0F6B4A", deep: "#0A3F2C", leaf: "#2E9E5B", gold: "#F2B33D", clay: "#E2603F", claySoft: "#F9DDD4",
-  sage: "#D6E6DC", sage2: "#C3DBCB", lilac: "#E1DAF0", lilac2: "#CFC3E8", butter: "#FBE7A6", butter2: "#F6D66E",
-  ink: "#141816", ink2: "#2A302C", white: "#FFFFFF", paper: "#F7F8F5",
-  skin1: "#6B3F26", skin2: "#8A5434", skin3: "#A8704A",
-};
+type Tone = readonly [top: string, left: string, right: string];
+const T = {
+  forest: ["#1F8A5E", "#0F6B4A", "#0A4F36"],
+  gold: ["#FFD36B", "#F2B33D", "#D6952A"],
+  clay: ["#F28A66", "#E2603F", "#BF4A2D"],
+  sand: ["#F6E7CB", "#E7CFA4", "#CDAE7C"],
+  cobalt: ["#7D98F7", "#4A6CE8", "#3350B8"],
+  paper: ["#FFFFFF", "#EFF1EC", "#D9DDD5"],
+  ink: ["#4A514D", "#2A302C", "#141816"],
+  lilac: ["#ECE6F8", "#CFC3E8", "#B2A1D8"],
+  sage: ["#E6F0E9", "#C3DBCB", "#A3C4AE"],
+} as const satisfies Record<string, Tone>;
+const INK = "#141816", SAGE = "#D6E6DC", WHITE = "#FFFFFF";
 
-type P = [number, number];
-type Limb = [P, P, P];
+type V3 = [number, number, number];
+/** Isometric projection: x runs right-down, y runs left-down, z runs up. */
+const iso = ([x, y, z]: V3): [number, number] => [(x - y) * 0.866, (x + y) * 0.5 - z];
+const d = (pts: V3[]) => "M" + pts.map((p) => iso(p).map((n) => n.toFixed(1)).join(" ")).join("L") + "Z";
+const Poly = ({ pts, fill, opacity }: { pts: V3[]; fill: string; opacity?: number }) => <path d={d(pts)} fill={fill} opacity={opacity} />;
 
-/** One person. Coordinates are relative to the hips; y grows downward. Limbs are hip→knee→foot and
- *  shoulder→elbow→hand; the first of each pair is drawn behind the body. */
-function Person({ x, y, s = 1, skin, top, bottom, shoe = C.ink, hair = C.ink, wrap, stole, legs, arms, dir = 1, holding }: {
-  x: number; y: number; s?: number; skin: string; top: string; bottom: string; shoe?: string; hair?: string; wrap?: string;
-  stole?: boolean; legs: [Limb, Limb]; arms: [Limb, Limb]; dir?: 1 | -1; holding?: React.ReactNode;
-}) {
-  const line = (l: Limb) => `M${l[0][0]} ${l[0][1]}L${l[1][0]} ${l[1][1]}L${l[2][0]} ${l[2][1]}`;
-  const leg = (l: Limb, k: string) => (
-    <g key={k}>
-      <path d={line(l)} fill="none" stroke={bottom} strokeWidth="25" strokeLinecap="round" strokeLinejoin="round" />
-      <ellipse cx={l[2][0] + 9 * dir} cy={l[2][1] + 8} rx="21" ry="10" fill={shoe} />
-    </g>
-  );
-  const arm = (l: Limb, k: string) => (
-    <g key={k}>
-      <path d={line(l)} fill="none" stroke={top} strokeWidth="18" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={l[2][0]} cy={l[2][1]} r="11" fill={skin} />
-    </g>
-  );
+/** Flat rectangles on the three visible planes: the ground plane (top), the left face (y fixed), the right face (x fixed). */
+const onTop = (x: number, y: number, z: number, w: number, dd: number): V3[] => [[x, y, z], [x + w, y, z], [x + w, y + dd, z], [x, y + dd, z]];
+const onLeft = (x: number, y: number, z: number, w: number, h: number): V3[] => [[x, y, z], [x + w, y, z], [x + w, y, z + h], [x, y, z + h]];
+const onRight = (x: number, y: number, z: number, dd: number, h: number): V3[] => [[x, y, z], [x, y + dd, z], [x, y + dd, z + h], [x, y, z + h]];
+
+function Box({ x, y, z = 0, w, dd, h, tone, sides }: { x: number; y: number; z?: number; w: number; dd: number; h: number; tone: Tone; sides?: Tone }) {
+  const s = sides ?? tone;
   return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      {arm(arms[0], "a0")}
-      {leg(legs[0], "l0")}
-      <path d="M-23 4L-29-78Q-30-94-14-94H14Q30-94 29-78L23 4Z" fill={top} />
-      <path d="M8-94H14Q30-94 29-78L23 4H4Z" fill={C.ink} opacity=".12" />
-      {stole && <g><path d="M-18-94L-6-94L-2 4L-14 4Z" fill={C.gold} /><path d="M-15-60H-3M-14-30H-2M-13-2H-1" stroke={C.forest} strokeWidth="5" /><path d="M-12-80H-4" stroke={C.clay} strokeWidth="4" /></g>}
-      {leg(legs[1], "l1")}
-      <rect x="-7" y="-108" width="14" height="18" fill={skin} />
-      <circle cx={2 * dir} cy="-124" r="18" fill={skin} />
-      {wrap
-        ? <path d={`M-20-126Q-22-154 2-156Q26-156 24-128Q34-146 18-152Q4-140-20-126Z`} fill={wrap} transform={dir === -1 ? "scale(-1 1)" : undefined} />
-        : <path d="M-18-128Q-18-146 2-146Q22-146 20-128Q12-138 2-138Q-10-138-18-128Z" fill={hair} />}
-      {arm(arms[1], "a1")}
-      {holding}
+    <g>
+      <Poly pts={onLeft(x, y + dd, z, w, h)} fill={s[1]} />
+      <Poly pts={onRight(x + w, y, z, dd, h)} fill={s[2]} />
+      <Poly pts={onTop(x, y, z + h, w, dd)} fill={tone[0]} />
     </g>
   );
 }
+/** Soft cast shadow on the ground, pushed away from the light. */
+const Shadow = ({ x, y, w, dd }: { x: number; y: number; w: number; dd: number }) => <Poly pts={onTop(x + 10, y + 10, 0, w, dd)} fill={INK} opacity={0.1} />;
+/** A polyline on one of the planes, e.g. a tick on a screen. */
+function Stroke({ pts, color, width = 6 }: { pts: V3[]; color: string; width?: number }) {
+  return <path d={"M" + pts.map((p) => iso(p).join(" ")).join("L")} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />;
+}
 
-const STAND_LEGS: [Limb, Limb] = [[[-10, 0], [-12, 62], [-14, 120]], [[10, 0], [12, 62], [16, 120]]];
-const WALK_LEGS: [Limb, Limb] = [[[-8, 0], [-30, 58], [-50, 112]], [[8, 0], [30, 54], [34, 120]]];
-const SIT_LEGS: [Limb, Limb] = [[[-4, 0], [52, 2], [58, 64]], [[8, 0], [64, -2], [72, 62]]];
-const ARM_DOWN_L: Limb = [[-22, -84], [-32, -42], [-30, -4]];
-const ARM_DOWN_R: Limb = [[22, -84], [32, -42], [30, -4]];
+// ---------- objects ----------
 
-function Shadow({ x, y, w = 70 }: { x: number; y: number; w?: number }) {
-  return <ellipse cx={x} cy={y} rx={w} ry="10" fill={C.ink} opacity=".12" />;
-}
-function Phone({ x, y, r = 0, s = 1 }: { x: number; y: number; r?: number; s?: number }) {
-  return <g transform={`translate(${x} ${y}) rotate(${r}) scale(${s})`}><rect x="-13" y="-24" width="26" height="46" rx="6" fill={C.ink} /><rect x="-9" y="-18" width="18" height="32" rx="3" fill={C.sage} /></g>;
-}
-function Check({ x, y, s = 1, color = C.white }: { x: number; y: number; s?: number; color?: string }) {
-  return <path d={`M${x - 14 * s} ${y}l${10 * s} ${10 * s} ${20 * s}-${22 * s}`} fill="none" stroke={color} strokeWidth={7 * s} strokeLinecap="round" strokeLinejoin="round" />;
-}
-function Knot({ x, y, size, color, opacity = 1, width = 7 }: { x: number; y: number; size: number; color: string; opacity?: number; width?: number }) {
-  return <g transform={`translate(${x} ${y}) scale(${size / 100})`} opacity={opacity}><KnotMark color={color} width={width} /></g>;
-}
-/** Light film grain over the whole scene. */
-function Grain({ id, w, h }: { id: string; w: number; h: number }) {
+/** A book lying flat: cover on top and spine side, pages showing on the left face. */
+function Book({ x, y, z, w, dd, h, tone }: { x: number; y: number; z: number; w: number; dd: number; h: number; tone: Tone }) {
   return (
-    <>
-      <filter id={id} x="0" y="0" width="100%" height="100%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
-        <feColorMatrix type="saturate" values="0" />
-        <feComponentTransfer><feFuncA type="table" tableValues="0 0.09" /></feComponentTransfer>
-      </filter>
-      <rect width={w} height={h} filter={`url(#${id})`} />
-    </>
+    <g>
+      <Box x={x} y={y} z={z} w={w} dd={dd} h={h} tone={tone} />
+      <Poly pts={onLeft(x + 4, y + dd, z + 3, w - 8, h - 6)} fill={T.paper[1]} />
+      {[0.33, 0.66].map((f) => <Poly key={f} pts={onLeft(x + 4, y + dd, z + 3 + (h - 6) * f, w - 8, 1.2)} fill={T.paper[2]} />)}
+    </g>
+  );
+}
+/** A phone standing up, screen facing left. */
+function StandingPhone({ x, y, w = 64, h = 124, screen }: { x: number; y: number; w?: number; h?: number; screen?: React.ReactNode }) {
+  return (
+    <g>
+      <Shadow x={x} y={y} w={w} dd={10} />
+      <Box x={x} y={y} w={w} dd={8} h={h} tone={T.ink} />
+      <Poly pts={onLeft(x + 5, y + 8, 12, w - 10, h - 22)} fill={SAGE} />
+      <Poly pts={onLeft(x + w / 2 - 8, y + 8, h - 7, 16, 3)} fill={T.ink[0]} />
+      {screen}
+    </g>
+  );
+}
+function Pencil({ x, y, z, len = 150 }: { x: number; y: number; z: number; len?: number }) {
+  return (
+    <g>
+      <Box x={x} y={y} z={z} w={len} dd={10} h={10} tone={T.gold} />
+      <Box x={x - 14} y={y} z={z} w={14} dd={10} h={10} tone={T.clay} />
+      <Poly pts={[[x + len, y, z], [x + len + 22, y + 5, z + 5], [x + len, y + 10, z + 10], [x + len, y + 10, z]]} fill={T.sand[1]} />
+      <Poly pts={[[x + len, y, z + 10], [x + len + 22, y + 5, z + 5], [x + len, y + 10, z + 10]]} fill={T.sand[0]} />
+    </g>
+  );
+}
+/** A flat, front-on badge or bubble placed in screen space (Uber's spot art mixes these with the 3D objects). */
+function Bubble({ cx, cy, w, h, fill, tail = "left", children }: { cx: number; cy: number; w: number; h: number; fill: string; tail?: "left" | "right"; children?: React.ReactNode }) {
+  const x = cx - w / 2, y = cy - h / 2, tx = tail === "left" ? x + 22 : x + w - 22;
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx={h / 2.4} fill={fill} />
+      <path d={`M${tx - 10} ${y + h - 2}L${tx + (tail === "left" ? -6 : 6)} ${y + h + 18}L${tx + 12} ${y + h - 2}Z`} fill={fill} />
+      {children}
+    </g>
+  );
+}
+function Seal({ cx, cy, r, fill }: { cx: number; cy: number; r: number; fill: string }) {
+  return (
+    <g>
+      {Array.from({ length: 14 }, (_, i) => { const a = (i / 14) * Math.PI * 2; return <circle key={i} cx={cx + Math.cos(a) * r} cy={cy + Math.sin(a) * r} r={r * 0.3} fill={fill} />; })}
+      <circle cx={cx} cy={cy} r={r * 1.02} fill={fill} />
+      <path d={`M${cx - r * 0.42} ${cy + r * 0.02}l${r * 0.3} ${r * 0.3} ${r * 0.56}-${r * 0.62}`} fill="none" stroke={WHITE} strokeWidth={r * 0.2} strokeLinecap="round" strokeLinejoin="round" />
+    </g>
   );
 }
 
-// ---------- side-card scenes (400 × 480) ----------
+// ---------- side-card scenes (400 × 480): each is drawn around an origin near the card centre ----------
 
-const FLOOR = (fill: string) => <path d="M0 410Q200 380 400 410V480H0Z" fill={fill} />;
-
-const SCENES = {
-  /** A student points at their birthday on a calendar taller than they are. */
-  details: { bg: C.butter, draw: () => (<>
-    {FLOOR(C.butter2)}
-    <rect x="186" y="96" width="176" height="300" rx="14" fill={C.white} />
-    <rect x="186" y="96" width="176" height="60" rx="14" fill={C.forest} /><rect x="186" y="136" width="176" height="20" fill={C.forest} />
-    {[226, 322].map((cx) => <rect key={cx} x={cx - 7} y="78" width="14" height="40" rx="7" fill={C.ink} />)}
-    {Array.from({ length: 20 }, (_, i) => { const cx = 214 + (i % 5) * 30, cy = 186 + Math.floor(i / 5) * 48; return i === 12 ? <circle key={i} cx={cx} cy={cy} r="17" fill={C.clay} /> : <rect key={i} x={cx - 8} y={cy - 8} width="16" height="16" rx="4" fill={C.sage2} />; })}
-    <path d="M362 396L380 410H190L186 396Z" fill={C.ink} opacity=".1" />
-    <Shadow x={110} y={412} />
-    <Person x={110} y={292} skin={C.skin2} top={C.ink} bottom={C.forest} legs={STAND_LEGS} stole
-      arms={[ARM_DOWN_L, [[22, -84], [62, -112], [128, -112]]]} />
-  </>) },
-  /** A parent with a hand on their child's shoulder; the child holds up a phone. */
-  guardian: { bg: C.lilac, draw: () => (<>
-    {FLOOR(C.lilac2)}
-    <Knot x={250} y={40} size={120} color={C.white} opacity={0.6} />
-    <Shadow x={150} y={412} w={80} /><Shadow x={268} y={414} w={56} />
-    <Person x={268} y={330} s={0.72} skin={C.skin3} top={C.gold} bottom={C.ink} legs={STAND_LEGS}
-      arms={[ARM_DOWN_L, [[22, -84], [40, -50], [30, -96]]]} holding={<Phone x={28} y={-112} s={1.25} />} />
-    <Person x={150} y={290} s={1.02} skin={C.skin1} top={C.forest} bottom={C.ink2} wrap={C.clay} legs={STAND_LEGS}
-      arms={[ARM_DOWN_L, [[22, -84], [66, -66], [100, -22]]]} />
-  </>) },
-  /** Someone walks along with their phone, an oversized envelope behind them. */
-  contact: { bg: C.sage, draw: () => (<>
-    {FLOOR(C.sage2)}
-    <g transform="rotate(-8 270 200)"><rect x="170" y="120" width="200" height="140" rx="16" fill={C.white} /><path d="M176 132l94 70 94-70" fill="none" stroke={C.forest} strokeWidth="12" strokeLinejoin="round" strokeLinecap="round" /></g>
-    <circle cx="90" cy="96" r="34" fill={C.gold} />
-    <Shadow x={160} y={414} w={80} />
-    <Person x={160} y={292} skin={C.skin2} top={C.clay} bottom={C.ink} legs={WALK_LEGS}
-      arms={[[[-22, -84], [-44, -44], [-56, -10]], [[22, -84], [44, -60], [36, -108]]]} holding={<Phone x={34} y={-124} r={8} s={1.3} />} />
-  </>) },
-  /** A door-sized phone showing the code; a student leans in to read it. */
-  code: { bg: C.deep, draw: () => (<>
-    {FLOOR(C.forest)}
-    <Knot x={20} y={40} size={140} color={C.forest} opacity={0.9} width={6} />
-    <rect x="200" y="70" width="160" height="330" rx="28" fill={C.ink} />
-    <rect x="212" y="94" width="136" height="280" rx="16" fill={C.sage} />
-    {Array.from({ length: 6 }, (_, i) => <rect key={i} x={222 + (i % 3) * 42} y={180 + Math.floor(i / 3) * 56} width="34" height="44" rx="10" fill={i < 4 ? C.white : C.sage2} />)}
-    {Array.from({ length: 4 }, (_, i) => <circle key={i} cx={239 + (i % 3) * 42} cy={202 + Math.floor(i / 3) * 56} r="6" fill={C.forest} />)}
-    <rect x="236" y="120" width="88" height="22" rx="11" fill={C.gold} />
-    <Shadow x={120} y={414} />
-    <Person x={120} y={292} skin={C.skin3} top={C.gold} bottom={C.white} shoe={C.ink} legs={STAND_LEGS}
-      arms={[ARM_DOWN_L, [[22, -84], [56, -98], [92, -122]]]} />
-  </>) },
-  /** A student carries a giant key over their shoulder past their ID card. */
-  username: { bg: C.claySoft, draw: () => (<>
-    {FLOOR("#F2C9BB")}
-    <g transform="rotate(5 290 180)"><rect x="200" y="100" width="170" height="210" rx="18" fill={C.white} /><rect x="200" y="100" width="170" height="46" rx="18" fill={C.forest} /><rect x="200" y="126" width="170" height="20" fill={C.forest} />
-      <circle cx="285" cy="200" r="34" fill={C.butter} /><Knot x={261} y={176} size={48} color={C.forest} width={9} />
-      <rect x="236" y="250" width="98" height="14" rx="7" fill={C.ink} /><rect x="250" y="274" width="70" height="10" rx="5" fill={C.sage2} /></g>
-    <Shadow x={130} y={414} />
-    <Person x={130} y={292} skin={C.skin1} top={C.lilac2} bottom={C.ink} legs={WALK_LEGS} dir={1}
-      arms={[ARM_DOWN_L, [[22, -84], [44, -110], [20, -128]]]}
-      holding={<g transform="translate(18 -132) rotate(-28)"><circle cx="-34" cy="0" r="24" fill="none" stroke={C.gold} strokeWidth="13" /><rect x="-12" y="-7" width="110" height="14" rx="7" fill={C.gold} /><rect x="78" y="4" width="12" height="22" rx="4" fill={C.gold} /><rect x="58" y="4" width="10" height="16" rx="4" fill={C.gold} /></g>} />
-  </>) },
-  /** A parent walks hand in hand with one child while another runs ahead. */
-  family: { bg: C.butter, draw: () => (<>
-    {FLOOR(C.butter2)}
-    <path d="M60 230L200 120l140 110v170H60z" fill={C.white} opacity=".55" />
-    <path d="M40 240L200 112l160 128" fill="none" stroke={C.forest} strokeWidth="20" strokeLinecap="round" strokeLinejoin="round" />
-    <Shadow x={130} y={414} w={78} /><Shadow x={230} y={414} w={50} /><Shadow x={310} y={414} w={44} />
-    <Person x={310} y={350} s={0.6} skin={C.skin3} top={C.clay} bottom={C.ink} legs={WALK_LEGS} arms={[[[-22, -84], [-46, -60], [-64, -70]], [[22, -84], [46, -64], [64, -84]]]} />
-    <Person x={228} y={340} s={0.66} skin={C.skin2} top={C.gold} bottom={C.ink2} legs={WALK_LEGS} arms={[[[-22, -84], [-50, -60], [-120, -60]], ARM_DOWN_R]} />
-    <Person x={130} y={292} skin={C.skin1} top={C.forest} bottom={C.ink} wrap={C.clay} stole legs={WALK_LEGS} arms={[ARM_DOWN_L, [[22, -84], [46, -50], [74, -46]]]} />
-  </>) },
-  /** Someone steps through a tall open doorway into warm light. */
-  signin: { bg: C.lilac, draw: () => (<>
-    {FLOOR(C.lilac2)}
-    <path d="M170 404V170a80 80 0 0 1 160 0v234z" fill={C.deep} />
-    <path d="M186 404V176a64 64 0 0 1 128 0v228z" fill={C.butter} />
-    <path d="M314 176v228l-46 10V170z" fill={C.forest} />
-    <path d="M186 404l-60 40h188l60-40z" fill={C.butter2} opacity=".7" />
-    <Shadow x={190} y={414} w={60} />
-    <Person x={190} y={292} skin={C.skin2} top={C.ink} bottom={C.clay} legs={WALK_LEGS} stole
-      arms={[[[-22, -84], [-46, -46], [-60, -14]], [[22, -84], [50, -60], [66, -30]]]} />
-  </>) },
-  /** A parent gives a thumbs up beside a big approval seal. */
-  approve: { bg: C.sage, draw: () => (<>
-    {FLOOR(C.sage2)}
-    <g transform="translate(272 180)">
-      <path d="M-40 60l-24 90 32-16 20 28 20-84z" fill={C.clay} /><path d="M40 60l24 90-32-16-20 28-20-84z" fill={C.gold} />
-      {Array.from({ length: 14 }, (_, i) => { const a = (i / 14) * Math.PI * 2; return <circle key={i} cx={Math.cos(a) * 72} cy={Math.sin(a) * 72} r="22" fill={C.forest} />; })}
-      <circle r="76" fill={C.forest} /><Check x={0} y={-4} s={2} />
+const SCENES: Record<string, { bg: string; spot: string; draw: () => React.ReactNode }> = {
+  /** A desk calendar with a ringed date, and a slice of birthday cake. */
+  details: { bg: "#FBE7A6", spot: "#F6D66E", draw: () => (<>
+    <Shadow x={-70} y={-10} w={140} dd={44} />
+    <Poly pts={[[-70, 30, 0], [70, 30, 0], [70, -10, 150], [-70, -10, 150]]} fill={T.paper[1]} />
+    <Poly pts={[[70, 30, 0], [70, -40, 0], [70, -10, 150]]} fill={T.paper[2]} />
+    <Poly pts={[[-62, 26.5, 18], [62, 26.5, 18], [62, 6.5, 118], [-62, 6.5, 118]]} fill={WHITE} />
+    <Poly pts={[[-70, 1, 125], [70, 1, 125], [70, -10, 150], [-70, -10, 150]]} fill={T.forest[1]} />
+    {[-40, 40].map((x) => <Box key={x} x={x - 4} y={-14} z={146} w={8} dd={8} h={16} tone={T.ink} />)}
+    {Array.from({ length: 15 }, (_, i) => {
+      const cx = -48 + (i % 5) * 24, row = Math.floor(i / 5), z = 92 - row * 26, yy = 30 - (z / 150) * 40 - 2;
+      return <Poly key={i} pts={onLeft(cx - 7, yy, z, 14, 12)} fill={i === 7 ? T.clay[1] : T.sage[1]} />;
+    })}
+    <g transform="translate(96 46)">
+      <Shadow x={0} y={0} w={60} dd={46} />
+      <Box x={0} y={0} w={60} dd={46} h={26} tone={T.sand} />
+      <Box x={0} y={0} z={26} w={60} dd={46} h={8} tone={T.clay} />
+      <Box x={0} y={0} z={34} w={60} dd={46} h={18} tone={T.sand} />
+      <Box x={0} y={0} z={52} w={60} dd={46} h={6} tone={T.paper} />
+      <Box x={26} y={20} z={58} w={6} dd={6} h={28} tone={T.cobalt} />
+      <path d={(() => { const [fx, fy] = iso([29, 23, 92]); return `M${fx} ${fy - 16}q9 10 0 16q-9-6 0-16z`; })()} fill="#F2B33D" />
     </g>
-    <Shadow x={110} y={414} w={78} />
-    <Person x={110} y={290} skin={C.skin1} top={C.ink} bottom={C.forest} wrap={C.gold} legs={STAND_LEGS}
-      arms={[[[-22, -84], [-40, -44], [-24, -16]], [[22, -84], [60, -84], [62, -128]]]}
-      holding={<g><rect x="56" y="-150" width="12" height="20" rx="6" fill={C.skin1} /><Phone x={-22} y={-26} r={-10} /></g>} />
+  </>) },
+  /** A school backpack beside a phone showing a parent's approval tick. */
+  guardian: { bg: "#E1DAF0", spot: "#CFC3E8", draw: () => (<>
+    <Shadow x={-110} y={-10} w={90} dd={56} />
+    <Box x={-110} y={-10} w={90} dd={56} h={120} tone={T.clay} />
+    <Box x={-96} y={46} z={14} w={62} dd={14} h={54} tone={T.clay} sides={[T.clay[0], "#CF5434", T.clay[2]]} />
+    <Poly pts={onLeft(-96, 60, 58, 62, 6)} fill={T.gold[1]} />
+    {[-100, -38].map((x) => <Poly key={x} pts={onLeft(x, 46.5, 20, 10, 96)} fill={T.clay[2]} />)}
+    <path d={(() => { const a = iso([-80, 18, 120]), b = iso([-50, 18, 120]); return `M${a[0]} ${a[1]}Q${(a[0] + b[0]) / 2} ${a[1] - 46} ${b[0]} ${b[1]}`; })()} fill="none" stroke={T.clay[2]} strokeWidth="9" strokeLinecap="round" />
+    <StandingPhone x={30} y={10} screen={<>
+      <Poly pts={onLeft(44, 18, 48, 36, 36)} fill={T.forest[1]} />
+      <Stroke pts={[[50, 18, 66], [58, 18, 58], [74, 18, 76]]} color={WHITE} />
+      <Poly pts={onLeft(40, 18, 30, 44, 6)} fill={T.sage[2]} />
+    </>} />
+    <Bubble cx={112} cy={-176} w={92} h={50} fill="#0F6B4A" tail="left"><g transform="translate(112 -178)"><path d="M-14 0l8 8 18-18" fill="none" stroke={WHITE} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" /></g></Bubble>
+  </>) },
+  /** An envelope on the table and a phone with a new message. */
+  contact: { bg: "#D6E6DC", spot: "#C3DBCB", draw: () => (<>
+    <Shadow x={-100} y={20} w={150} dd={100} />
+    <Box x={-100} y={20} w={150} dd={100} h={6} tone={T.paper} />
+    <Stroke pts={[[-96, 24, 6], [-25, 74, 6], [46, 24, 6]]} color={T.forest[1]} width={7} />
+    <Stroke pts={[[-96, 116, 6], [-40, 80, 6]]} color={T.paper[2]} width={4} />
+    <Stroke pts={[[46, 116, 6], [-10, 80, 6]]} color={T.paper[2]} width={4} />
+    <StandingPhone x={60} y={-40} screen={<>
+      <Poly pts={onLeft(70, -32, 84, 40, 14)} fill={WHITE} />
+      <Poly pts={onLeft(78, -32, 62, 40, 14)} fill={T.forest[1]} />
+      <Poly pts={onLeft(70, -32, 40, 30, 14)} fill={WHITE} />
+    </>} />
+    <circle cx="-110" cy="-170" r="28" fill="#F2B33D" />
+  </>) },
+  /** A phone lying flat with a six-digit code, and a padlock that has just opened. */
+  code: { bg: "#0A3F2C", spot: "#0F6B4A", draw: () => (<>
+    <g transform="translate(40 -20)"><Shadow x={-90} y={-60} w={110} dd={190} />
+    <Box x={-90} y={-60} w={110} dd={190} h={12} tone={T.ink} />
+    <Poly pts={onTop(-82, -48, 12, 94, 166)} fill={SAGE} />
+    {Array.from({ length: 6 }, (_, i) => <Box key={i} x={-74 + (i % 2) * 42} y={-30 + Math.floor(i / 2) * 44} z={12} w={36} dd={34} h={4} tone={i < 4 ? T.paper : T.sage} />)}
+    {Array.from({ length: 4 }, (_, i) => <Poly key={i} pts={onTop(-62 + (i % 2) * 42, -18 + Math.floor(i / 2) * 44, 16, 12, 10)} fill={T.forest[1]} />)}</g>
+    <g transform="translate(112 -40)">
+      <Shadow x={0} y={0} w={70} dd={40} />
+      <path d={(() => { const a = iso([14, 20, 64]), b = iso([56, 20, 64]); return `M${a[0]} ${a[1]}V${a[1] - 34}a${(b[0] - a[0]) / 2} ${(b[0] - a[0]) / 2} 0 0 1 ${b[0] - a[0]} ${b[1] - a[1] - 10}V${b[1] - 40}`; })()} fill="none" stroke="#C7CCC8" strokeWidth="12" strokeLinecap="round" transform="translate(0 -14)" />
+      <Box x={0} y={0} w={70} dd={40} h={64} tone={T.gold} />
+      <Poly pts={onLeft(30, 40, 22, 10, 22)} fill={T.gold[2]} />
+    </g>
+  </>) },
+  /** A student ID card on a lanyard and a key. */
+  username: { bg: "#F9DDD4", spot: "#F2C9BB", draw: () => (<>
+    <path d={(() => { const a = iso([-60, 0, 210]), b = iso([60, 0, 210]), m = iso([0, 0, 168]); return `M${a[0]} ${a[1] - 70}L${m[0]} ${m[1]}L${b[0]} ${b[1] - 70}`; })()} fill="none" stroke="#4A6CE8" strokeWidth="10" strokeLinejoin="round" />
+    <Shadow x={-70} y={-6} w={140} dd={12} />
+    <Box x={-70} y={-6} w={140} dd={8} h={170} tone={T.paper} />
+    <Poly pts={onLeft(-70, 2, 132, 140, 38)} fill={T.forest[1]} />
+    <Box x={-12} y={-4} z={158} w={24} dd={10} h={20} tone={T.ink} />
+    <Poly pts={onLeft(-48, 2, 64, 54, 56)} fill="#FBE7A6" />
+    {[[14, 104, 44, INK], [14, 86, 34, T.sage[2]], [14, 70, 40, T.sage[2]]].map(([x, z, w, f], i) => <Poly key={i} pts={onLeft(x as number, 2, z as number, w as number, 8)} fill={f as string} />)}
+    <g transform="translate(-21 -18)">{(() => { const [cx, cy] = iso([-21, 2, 92]); return <g transform={`translate(${cx + 21} ${cy + 18}) scale(.36) translate(-50 -50)`}><KnotMark color="#0F6B4A" width={10} /></g>; })()}</g>
+    <g transform="translate(30 24)">
+      <Shadow x={0} y={0} w={120} dd={36} />
+      <ellipse cx={iso([18, 18, 6])[0]} cy={iso([18, 18, 6])[1]} rx="30" ry="18" fill="none" stroke="#D6952A" strokeWidth="14" />
+      <ellipse cx={iso([18, 18, 8])[0]} cy={iso([18, 18, 8])[1]} rx="30" ry="18" fill="none" stroke="#F2B33D" strokeWidth="11" />
+      <Box x={40} y={12} w={86} dd={12} h={8} tone={T.gold} />
+      <Box x={100} y={24} w={12} dd={14} h={8} tone={T.gold} />
+      <Box x={80} y={24} w={10} dd={10} h={8} tone={T.gold} />
+    </g>
+  </>) },
+  /** A small house with a garden tree: home, where the parent's account lives. */
+  family: { bg: "#FBE7A6", spot: "#F6D66E", draw: () => (<>
+    <Shadow x={-90} y={-60} w={150} dd={120} />
+    <Box x={-90} y={-60} w={150} dd={120} h={90} tone={T.sand} />
+    <Poly pts={[[-96, 66, 88], [66, 66, 88], [66, 0, 150], [-96, 0, 150]]} fill={T.clay[1]} />
+    <Poly pts={[[60, -60, 90], [60, 60, 90], [60, 0, 146]]} fill={T.sand[2]} />
+    <Poly pts={[[66, 66, 88], [66, 0, 150], [66, -66, 88], [70, -66, 86], [70, 0, 148]]} fill={T.clay[2]} />
+    <Poly pts={onLeft(-40, 60, 0, 34, 56)} fill={T.forest[1]} />
+    <Poly pts={onLeft(-14, 60, 26, 4, 6)} fill={T.gold[1]} />
+    <Poly pts={onLeft(10, 60, 36, 32, 30)} fill={WHITE} /><Poly pts={onLeft(24, 60, 36, 3, 30)} fill={T.sand[2]} />
+    <Poly pts={onRight(60, -30, 40, 40, 28)} fill={T.cobalt[0]} />
+    <g transform="translate(-150 40)">
+      <Shadow x={0} y={0} w={20} dd={20} />
+      <Box x={0} y={0} w={14} dd={14} h={60} tone={T.sand} sides={["#B88A55", "#9C7444", "#7E5C35"]} />
+      {(() => { const [cx, cy] = iso([7, 7, 100]); return <g><circle cx={cx} cy={cy} r="44" fill="#0F6B4A" /><path d={`M${cx} ${cy - 44}a44 44 0 0 1 0 88z`} fill="#0A4F36" /></g>; })()}
+    </g>
+  </>) },
+  /** An open padlock and its key. */
+  signin: { bg: "#E1DAF0", spot: "#CFC3E8", draw: () => (<>
+    <g transform="translate(-40 0)">
+      <Shadow x={-50} y={-30} w={100} dd={60} />
+      {(() => { const a = iso([-30, 0, 84]), b = iso([30, 0, 84]); const r = (b[0] - a[0]) / 2; return <path d={`M${a[0]} ${a[1]}V${a[1] - 50}a${r} ${r} 0 0 1 ${2 * r} 0V${a[1] - 70}`} fill="none" stroke="#B8BDB9" strokeWidth="16" strokeLinecap="round" transform="translate(-6 -30)" />; })()}
+      <Box x={-50} y={-30} w={100} dd={60} h={90} tone={T.cobalt} />
+      <Poly pts={onLeft(-8, 30, 30, 16, 30)} fill={T.cobalt[2]} />
+    </g>
+    <g transform="translate(36 30)">
+      <Shadow x={0} y={0} w={110} dd={30} />
+      <ellipse cx={iso([14, 14, 6])[0]} cy={iso([14, 14, 6])[1]} rx="26" ry="15" fill="none" stroke="#D6952A" strokeWidth="12" />
+      <ellipse cx={iso([14, 14, 8])[0]} cy={iso([14, 14, 8])[1]} rx="26" ry="15" fill="none" stroke="#F2B33D" strokeWidth="9" />
+      <Box x={34} y={9} w={76} dd={10} h={7} tone={T.gold} />
+      <Box x={90} y={19} w={10} dd={12} h={7} tone={T.gold} />
+    </g>
+  </>) },
+  /** A signed form on a clipboard with an approval seal, and a pen. */
+  approve: { bg: "#D6E6DC", spot: "#C3DBCB", draw: () => (<>
+    <Shadow x={-70} y={-10} w={140} dd={14} />
+    <Box x={-70} y={-10} w={140} dd={10} h={190} tone={T.sand} />
+    <Poly pts={onLeft(-58, 0, 14, 116, 150)} fill={WHITE} />
+    <Box x={-26} y={-12} z={176} w={52} dd={14} h={22} tone={T.ink} />
+    {[150, 130, 110, 90].map((z, i) => <Poly key={z} pts={onLeft(-46, 0, z, i % 2 ? 60 : 84, 7)} fill={T.sage[2]} />)}
+    <Stroke pts={[[-46, 0, 44], [-30, 0, 54], [-18, 0, 40], [0, 0, 52]]} color="#4A6CE8" width={4} />
+    <Seal cx={iso([36, 0, 52])[0]} cy={iso([36, 0, 52])[1]} r={30} fill="#0F6B4A" />
+    <g transform="translate(-10 34)"><Box x={0} y={0} w={120} dd={9} h={9} tone={T.cobalt} /><Poly pts={[[120, 0, 0], [138, 4.5, 4.5], [120, 9, 9], [120, 9, 0]]} fill={T.ink[1]} /><Box x={-10} y={0} w={10} dd={9} h={9} tone={T.ink} /></g>
   </>) },
 };
-export type ArtKind = keyof typeof SCENES;
+export type ArtKind = "details" | "guardian" | "contact" | "code" | "username" | "family" | "signin" | "approve";
+
+/** Where each scene sits on its card: measured from the drawing's extent so it is centred with a margin and
+ *  never runs off the edge. Re-measure (getBBox on the inner group) after changing a scene. */
+const FIT: Record<ArtKind, string> = {"details": "translate(164 287) scale(1.24)", "guardian": "translate(188 308) scale(1.08)", "contact": "translate(222 285) scale(0.95)", "code": "translate(189 277) scale(0.98)", "username": "translate(170 323) scale(0.88)", "family": "translate(238 301) scale(1.01)", "signin": "translate(186 292) scale(1.18)", "approve": "translate(176 308) scale(1.12)"};
 
 /** A full-bleed illustrated card for the side column on wide screens. */
 export function Art({ kind }: { kind: ArtKind }) {
-  const id = useId().replace(/:/g, "");
   const sc = SCENES[kind];
   return (
     <div className="art" aria-hidden="true">
-      <svg viewBox="0 0 400 480" preserveAspectRatio="xMidYMid slice"><rect width="400" height="480" fill={sc.bg} />{sc.draw()}<Grain id={`g${id}`} w={400} h={480} /></svg>
+      <svg viewBox="0 0 400 480" preserveAspectRatio="xMidYMid slice">
+        <rect width="400" height="480" fill={sc.bg} />
+        <circle cx="200" cy="250" r="150" fill={sc.spot} />
+        <g transform={FIT[kind]}>{sc.draw()}</g>
+      </svg>
     </div>
   );
 }
 
-// ---------- welcome slides (400 × 400, drawn on the slide's own colour) ----------
+// ---------- welcome slides (400 × 400, on the slide's own colour) ----------
 
 const SLIDES = {
-  /** A student sits on a stack of giant books, reading. */
+  /** A stack of textbooks with a pencil across the top. */
   syllabus: () => (<>
-    <Shadow x={200} y={362} w={150} />
-    {[[90, 300, 220, C.forest], [70, 250, 250, C.clay], [100, 200, 200, C.white]].map(([x, y, w, f], i) => (
-      <g key={i}><rect x={x as number} y={y as number} width={w as number} height="50" rx="8" fill={f as string} /><rect x={(x as number) + 14} y={(y as number) + 10} width="8" height="30" rx="4" fill={i === 2 ? C.sage2 : C.white} opacity=".7" /></g>
-    ))}
-    <Person x={180} y={200} s={0.78} skin={C.skin2} top={C.gold} bottom={C.ink} legs={SIT_LEGS}
-      arms={[[[-22, -84], [10, -60], [46, -78]], [[22, -84], [44, -60], [62, -76]]]}
-      holding={<g transform="translate(56 -92) rotate(-14)"><path d="M-30 0Q-15-10 0 0Q15-10 30 0V30Q15 20 0 30Q-15 20-30 30Z" fill={C.white} /><path d="M0 0V30" stroke={C.sage2} strokeWidth="3" /></g>} />
-    <path d="M300 120l26-46 26 46z" fill={C.gold} /><rect x="60" y="80" width="40" height="40" rx="10" fill={C.forest} transform="rotate(14 80 100)" />
+    <Shadow x={-120} y={-50} w={200} dd={120} />
+    <Book x={-110} y={-44} z={0} w={190} dd={112} h={26} tone={T.forest} />
+    <Book x={-120} y={-36} z={26} w={180} dd={104} h={24} tone={T.clay} />
+    <Book x={-96} y={-50} z={50} w={170} dd={110} h={22} tone={T.cobalt} />
+    <Poly pts={onTop(-60, -30, 72.5, 90, 70)} fill={T.cobalt[0]} />
+    <Poly pts={onTop(-44, -16, 73, 58, 10)} fill={WHITE} opacity={0.7} />
+    <Pencil x={-70} y={40} z={72} len={140} />
   </>),
-  /** A student strides along a winding path towards a flag. */
+  /** A week planner with ticked days and an alarm clock. */
   plan: () => (<>
-    <circle cx="320" cy="80" r="40" fill={C.gold} />
-    <path d="M20 370C120 370 110 290 190 280S300 260 330 170" fill="none" stroke={C.white} strokeWidth="34" strokeLinecap="round" />
-    <path d="M20 370C120 370 110 290 190 280S300 260 330 170" fill="none" stroke={C.butter2} strokeWidth="4" strokeDasharray="2 16" strokeLinecap="round" />
-    <rect x="326" y="96" width="7" height="74" rx="3.5" fill={C.ink} /><path d="M333 98h48l-13 15 13 15h-48z" fill={C.clay} />
-    <Shadow x={180} y={366} w={56} />
-    <Person x={180} y={262} s={0.8} skin={C.skin1} top={C.forest} bottom={C.ink} stole legs={WALK_LEGS}
-      arms={[[[-22, -84], [-46, -48], [-62, -16]], [[22, -84], [48, -60], [70, -40]]]} />
+    <Shadow x={-130} y={-70} w={190} dd={140} />
+    <Box x={-130} y={-70} w={190} dd={140} h={8} tone={T.paper} />
+    {Array.from({ length: 5 }, (_, i) => (
+      <g key={i}>
+        <Box x={-114} y={-56 + i * 26} z={8} w={20} dd={18} h={3} tone={i < 3 ? T.forest : T.sage} />
+        {i < 3 && <Stroke pts={[[-110, -44 + i * 26, 11], [-104, -40 + i * 26, 11], [-96, -50 + i * 26, 11]]} color={WHITE} width={3.5} />}
+        <Poly pts={onTop(-84, -52 + i * 26, 8.5, i % 2 ? 90 : 120, 10)} fill={T.sage[1]} />
+      </g>
+    ))}
+    {(() => { const [cx, cy] = iso([100, 10, 70]); return (
+      <g>
+        <ellipse cx={cx + 14} cy={cy + 74} rx="54" ry="16" fill={INK} opacity=".1" />
+        {[-34, 34].map((dx) => <circle key={dx} cx={cx + dx} cy={cy - 52} r="16" fill="#BF4A2D" />)}
+        <circle cx={cx + 6} cy={cy + 4} r="62" fill="#BF4A2D" />
+        <circle cx={cx} cy={cy} r="62" fill="#E2603F" />
+        <circle cx={cx} cy={cy} r="48" fill={WHITE} />
+        <path d={`M${cx} ${cy}V${cy - 30}M${cx} ${cy}L${cx + 22} ${cy + 10}`} stroke={INK} strokeWidth="6" strokeLinecap="round" />
+        <circle cx={cx} cy={cy} r="5" fill={INK} />
+        {[-26, 26].map((dx) => <path key={dx} d={`M${cx + dx * 0.8} ${cy + 56}l${dx * 0.4} 18`} stroke="#BF4A2D" strokeWidth="8" strokeLinecap="round" />)}
+      </g>
+    ); })()}
   </>),
-  /** A student at a desk with a laptop; speech bubbles from the tutor float above. */
+  /** An open laptop with the tutor chatting on screen. */
   tutor: () => (<>
-    <path d="M200 40h150a24 24 0 0 1 24 24v50a24 24 0 0 1-24 24H250l-28 24v-24H200a24 24 0 0 1-24-24V64a24 24 0 0 1 24-24z" fill={C.deep} />
-    {[236, 274, 312].map((x) => <circle key={x} cx={x} cy="89" r="9" fill={C.gold} />)}
-    <path d="M60 110h100a22 22 0 0 1 22 22v34a22 22 0 0 1-22 22h-10v22l-26-22H60a22 22 0 0 1-22-22v-34a22 22 0 0 1 22-22z" fill={C.white} />
-    <circle cx="110" cy="146" r="16" fill={C.gold} /><rect x="103" y="164" width="14" height="8" rx="3" fill={C.ink} />
-    <Shadow x={210} y={372} w={160} />
-    <rect x="96" y="314" width="64" height="12" rx="6" fill={C.forest} /><rect x="104" y="326" width="10" height="44" fill={C.forest} /><rect x="142" y="326" width="10" height="44" fill={C.forest} />
-    <Person x={126} y={314} s={0.8} skin={C.skin3} top={C.clay} bottom={C.ink2} legs={SIT_LEGS}
-      arms={[[[-22, -84], [20, -56], [76, -60]], [[22, -84], [54, -52], [96, -60]]]} />
-    <rect x="170" y="262" width="200" height="14" rx="6" fill={C.ink} /><rect x="186" y="276" width="12" height="94" fill={C.ink} /><rect x="342" y="276" width="12" height="94" fill={C.ink} />
-    <path d="M226 262l14-54h72l-14 54z" fill={C.ink2} /><circle cx="262" cy="234" r="6" fill={C.sage} />
+    <Shadow x={-110} y={-40} w={200} dd={130} />
+    <Box x={-110} y={-40} w={200} dd={130} h={10} tone={T.ink} sides={[T.ink[0], "#3A403C", T.ink[2]]} />
+    <Poly pts={onTop(-96, -6, 10, 172, 70)} fill={T.ink[1]} />
+    <Poly pts={onTop(-36, 66, 10, 52, 18)} fill={T.ink[2]} />
+    <Box x={-110} y={-48} z={10} w={200} dd={8} h={140} tone={T.ink} />
+    <Poly pts={onLeft(-102, -40, 20, 184, 122)} fill={SAGE} />
+    <Poly pts={onLeft(-90, -40, 104, 110, 22)} fill="#0F6B4A" />
+    <Poly pts={onLeft(-20, -40, 70, 98, 22)} fill={WHITE} />
+    <Poly pts={onLeft(-90, -40, 36, 80, 22)} fill="#0F6B4A" />
+    <Bubble cx={126} cy={-170} w={96} h={56} fill="#F2B33D" tail="left">
+      <g transform="translate(126 -172)"><circle r="11" cy="-4" fill={WHITE} /><rect x="-6" y="8" width="12" height="6" rx="2" fill={INK} /></g>
+    </Bubble>
   </>),
 };
 export type SlideArtKind = keyof typeof SLIDES;
 
+/** Same idea as FIT, for the 400 × 400 welcome slides. */
+const SLIDE_FIT: Record<SlideArtKind, string> = {"syllabus": "translate(230 241) scale(1.19)", "plan": "translate(214 222) scale(1.03)", "tutor": "translate(200 266) scale(0.95)"};
+
 export function SlideArt({ kind }: { kind: SlideArtKind }) {
-  return <svg className="slideart" viewBox="0 0 400 400" aria-hidden="true">{SLIDES[kind]()}</svg>;
+  return <svg className="slideart" viewBox="0 0 400 400" aria-hidden="true"><g transform={SLIDE_FIT[kind]}>{SLIDES[kind]()}</g></svg>;
 }
