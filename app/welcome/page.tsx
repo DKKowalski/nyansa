@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { I } from "@/components/icons";
 import { KnotMark, LogoBare, Wordmark } from "@/components/brand";
-import { useToast } from "@/components/toast";
+import { useApp } from "@/lib/store";
 
 const pill = (on: boolean): React.CSSProperties => ({ background: on ? "var(--ink)" : "#fff", color: on ? "#fff" : "var(--ink)", borderRadius: 999, padding: "9px 14px", fontSize: 14 });
 
@@ -74,10 +74,10 @@ const SLIDES: { bg: string; t: string; s: string; art: () => React.ReactNode }[]
   },
 ];
 
-/** A1 Welcome: three short slides, then sign-up. */
+/** A1 Welcome: three short slides, then sign up as a student or a parent, or sign in. */
 export default function Welcome() {
   const [i, setI] = useState(0);
-  const toast = useToast();
+  const set = useApp((s) => s.set);
   const sl = SLIDES[i], last = i === SLIDES.length - 1;
   const touchX = useRef<number | null>(null);
   const swipe = {
@@ -107,9 +107,9 @@ export default function Welcome() {
           </div>
           {last ? (
             <div className="cta" style={{ marginTop: "auto" }}>
-              <Link className="btn" href="/setup/phone">Continue with phone number</Link>
-              <button type="button" className="btn light" onClick={() => toast("Google sign-in comes later")}><I.google />Continue with Google</button>
-              <button type="button" className="btn text" onClick={() => toast("Log in comes later")}>I already have an account</button>
+              <Link className="btn" href="/signup/level" onClick={() => set({ role: "student" })}>I&apos;m a student</Link>
+              <Link className="btn light" href="/signup/parent" onClick={() => set({ role: "parent" })}><I.people />I&apos;m a parent or guardian</Link>
+              <Link className="btn text" href="/signin">I already have an account · <b style={{ fontWeight: 500 }}>Sign in</b></Link>
             </div>
           ) : (
             <div className="wnav">

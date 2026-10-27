@@ -1,19 +1,19 @@
 "use client";
 import { I } from "@/components/icons";
-import { CtaLink } from "@/components/ui";
-import { SetupTop } from "@/components/shells";
+import { SetupTop, useNextStep } from "@/components/shells";
 import { StatRow } from "@/components/viz";
 import { CORE } from "@/lib/content";
 import { subjectsOf, useApp } from "@/lib/store";
 
 /** A4 Subjects: all 4 core subjects on by default; electives come later. */
 export default function Subjects() {
+  const next = useNextStep();
   const { subjects, toggleSubject } = useApp();
   const sel = subjectsOf(subjects);
   const tot = CORE.filter((c) => sel.includes(c.name)).reduce((t, c) => t + c.topics, 0);
   return (
     <div className="scr">
-      <SetupTop step="subjects" />
+      <SetupTop />
       <div className="cols obc">
         <div className="col">
           <p className="hello">Your subjects</p>
@@ -45,7 +45,7 @@ export default function Subjects() {
         </div>
       </div>
       <div className="cta">
-        <CtaLink href="/setup/goal" ready={sel.length > 0}>Continue</CtaLink>
+        <button type="button" className="btn" disabled={!sel.length} onClick={() => next()}>Continue</button>
       </div>
     </div>
   );

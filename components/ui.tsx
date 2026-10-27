@@ -1,8 +1,10 @@
 "use client";
-import { useRef } from "react";
+import { useId, useRef, useState } from "react";
 import Link from "next/link";
 import { Dialog, Switch } from "radix-ui";
 import { haptic } from "./motion";
+import { I } from "./icons";
+import { ghanaDigits, isGhanaMobile } from "@/lib/phone";
 
 /** Primary action that is a link when ready and a disabled button until then. */
 export function CtaLink({ href, ready = true, className = "btn", children }: { href: string; ready?: boolean; className?: string; children: React.ReactNode }) {
@@ -76,4 +78,64 @@ export function Sheet({ open, onOpenChange, title, children }: { open: boolean; 
       </Dialog.Portal>
     </Dialog.Root>
   );
+}
+
+/** Consent checkbox. Links open the documents in a new tab so the form keeps what was typed. */
+export function Agree({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) {
+  return (
+    <label className="agree">
+      <input type="checkbox" checked={checked} onChange={(e) => { haptic("tap"); onChange(e.target.checked); }} />
+      <span className="box" aria-hidden="true"><I.check /></span>
+      <span>{children}</span>
+    </label>
+  );
+}
+export const TermsLinks = () => (
+  <><Link href="/terms" target="_blank" className="linkbtn">Terms and Conditions</Link> and <Link href="/privacy" target="_blank" className="linkbtn">Privacy Policy</Link></>
+);
+
+/** What is wrong with a Ghana mobile number as typed, or null while it is empty or valid. */
+export function phoneHint(phone: string) {
+  const digits = ghanaDigits(phone);
+  return !phone.trim() || isGhanaMobile(phone) ? null
+    : digits.length > 9 ? "That's too many digits. Enter the 9 digits after +233."
+    : digits.length === 9 ? "Ghana mobile numbers start with 2 or 5, like 24 or 55."
+    : "Enter the 9 digits after +233, like 24 123 4567.";
+}
+
+/** +233 phone field with an inline hint. Shows the hint only once enough is typed to judge, unless `strict`. */
+export function PhoneField({ value, onChange, label = "Phone number", placeholder = "24 123 4567", note, autoFocus }: {
+  value: string; onChange: (v: string) => void; label?: string; placeholder?: string; note?: React.ReactNode; autoFocus?: boolean;
+}) {
+  const id = useId();
+  const hint = phoneHint(value);
+  return (
+    <>
+      <div className="phone">
+        <span className="cc"><span className="flag" />+233</span>
+        <input className="input" inputMode="tel" autoComplete="tel-national" aria-label={label} placeholder={placeholder} value={value}
+          onChange={(e) => onChange(e.target.value)} autoFocus={autoFocus} maxLength={18} aria-invalid={!!hint && ghanaDigits(value).length >= 9} aria-describedby={id} />
+      </div>
+      {(hint || note) && <p className="small" id={id} aria-live="polite" style={hint ? { color: "#9A3A20", margin: 0 } : { margin: 0 }}>{hint ?? note}</p>}
+    </>
+  );
+}
+
+/** Password field with a show/hide button (easier than typing it twice on a phone). */
+export function PasswordField({ value, onChange, label = "Password", placeholder = "Choose a password", autoComplete = "new-password" }: {
+  value: string; onChange: (v: string) => void; label?: string; placeholder?: string; autoComplete?: string;
+}) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="pwfield">
+      <input className="input" type={show ? "text" : "password"} autoComplete={autoComplete} aria-label={label} placeholder={placeholder}
+        value={value} onChange={(e) => onChange(e.target.value)} />
+      <button type="button" className="pwshow" onClick={() => setShow(!show)} aria-pressed={show}>{show ? "Hide" : "Show"}</button>
+    </div>
+  );
+}
+
+/** A small hint under a field: red when something is wrong. */
+export function Hint({ error, children }: { error?: boolean; children: React.ReactNode }) {
+  return <p className="small" aria-live="polite" style={{ margin: 0, ...(error ? { color: "#9A3A20" } : {}) }}>{children}</p>;
 }

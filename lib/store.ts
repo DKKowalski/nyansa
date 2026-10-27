@@ -2,15 +2,32 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { CORE, PQ, QUESTIONS, STRANDS, type Exam } from "./content";
+import type { Approval, Contact, Guardian, Level } from "./account";
 
 export type Role = "student" | "parent";
 export type Mood = "confident" | "okay" | "nervous";
 export type ChatMsg = { me: string } | { ai: string };
 
+/** A child a parent created a login for. The starter password is shown once on the login card, never saved. */
+export interface Kid { name: string; exam: Exam; cls: string; user: string; av: string }
+
 interface Profile {
   phone: string;
-  name: string;
+  email: string;
+  /** Which one we verified and they sign in with; the other is optional. */
+  contact: Contact;
+  name: string; // first name
+  lastName: string;
   role: Role;
+  level: Level | null;
+  dob: string; // ISO yyyy-mm-dd
+  username: string;
+  /** Under 18 only: the parent or guardian who consents for them. */
+  guardian: Guardian | null;
+  approval: Approval;
+  /** When the Terms and Privacy Policy were accepted, and by whom. */
+  consent: { by: "self" | "guardian"; at: number } | null;
+  kids: Kid[];
   exam: Exam | null;
   cls: string | null;
   subjects: string[] | null; // null = all core subjects
@@ -49,7 +66,8 @@ interface Actions {
 }
 
 const profile0: Profile = {
-  phone: "", name: "", role: "student", exam: null, cls: null, subjects: null, date: "",
+  phone: "", email: "", contact: "phone", name: "", lastName: "", role: "student", level: null, dob: "", username: "",
+  guardian: null, approval: "none", consent: null, kids: [], exam: null, cls: null, subjects: null, date: "",
   minutes: 30, saveData: true, mood: null, answers: {}, onboarded: false,
 };
 const session0: Session = { pans: {}, psetDone: false, pattempt: 0, mans: {}, mflag: [], mockEndsAt: null, mattempt: 0, tq: -1, chat: null, now: null };

@@ -14,7 +14,8 @@ export default function Settings() {
   const toast = useToast();
   const router = useRouter();
   const rows: [string, string, string][] = [
-    ["Name", firstName(s.name), "/setup/name"],
+    ["Name", firstName(s.name), "/signup/details"],
+    ["Username", s.username || "—", "/signup/username"],
     ["Exam", `${examName(s.exam)} · ${s.cls ?? "JHS 3"}`, "/setup/exam"],
     ["Subjects", `${subjectsOf(s.subjects).length} core subjects`, "/setup/subjects"],
     ["Exam date", new Date(examDate(s) + "T00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }), "/setup/goal"],

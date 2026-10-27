@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
-import { CtaLink } from "@/components/ui";
 import { Segmented } from "@/components/motion";
 import { I } from "@/components/icons";
-import { SetupTop } from "@/components/shells";
+import { SetupTop, useNextStep } from "@/components/shells";
 import { daysLeft, examDate, examName, useApp } from "@/lib/store";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -12,6 +11,7 @@ const iso = (y: number, m: number, d: number) => `${y}-${String(m + 1).padStart(
 
 /** A5 Exam date (pre-filled with the expected sitting) and daily goal. */
 export default function Goal() {
+  const next = useNextStep();
   const s = useApp();
   const date = examDate(s);
   const d0 = new Date(date + "T00:00:00");
@@ -23,7 +23,7 @@ export default function Goal() {
   const left = daysLeft(s), hrs = Math.round((left * s.minutes) / 60);
   return (
     <div className="scr">
-      <SetupTop step="goal" />
+      <SetupTop />
       <p className="hello">{examName(s.exam)} · {left} days away</p>
       <h1 className="h-l">Exam date and daily goal</h1>
       <div className="cols obc">
@@ -65,7 +65,7 @@ export default function Goal() {
           </div>
         </div>
       </div>
-      <div className="cta"><CtaLink href="/setup/prefs">Continue</CtaLink></div>
+      <div className="cta"><button type="button" className="btn" onClick={() => next()}>Continue</button></div>
     </div>
   );
 }

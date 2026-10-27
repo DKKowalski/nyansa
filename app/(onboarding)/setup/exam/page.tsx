@@ -1,7 +1,6 @@
 "use client";
 import { Deco, I } from "@/components/icons";
-import { CtaLink } from "@/components/ui";
-import { SetupTop } from "@/components/shells";
+import { SetupTop, useNextStep } from "@/components/shells";
 import type { Exam as ExamT } from "@/lib/content";
 import { firstName, useApp } from "@/lib/store";
 
@@ -12,10 +11,11 @@ const EXAMS: { v: ExamT; bg: string; k: string; n: string; facts: string[] }[] =
 
 /** A3 Choose exam. */
 export default function Exam() {
+  const next = useNextStep();
   const { exam, name, set } = useApp();
   return (
     <div className="scr">
-      <SetupTop step="exam" />
+      <SetupTop />
       <p className="hello">Hello, {firstName(name)}</p>
       <h1 className="h-xl">Which exam are you writing?</h1>
       <div className="grid2 examgrid">
@@ -33,7 +33,7 @@ export default function Exam() {
         ))}
       </div>
       <div className="cta">
-        <CtaLink href="/setup/class" ready={!!exam}>Continue</CtaLink>
+        <button type="button" className="btn" disabled={!exam} onClick={() => next()}>Continue</button>
       </div>
     </div>
   );

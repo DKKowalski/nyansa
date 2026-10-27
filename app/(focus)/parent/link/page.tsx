@@ -14,7 +14,7 @@ export default function LinkChild() {
   const set = useApp((s) => s.set);
   return (
     <div className="scr">
-      <div className="top"><BackLink href={parentSignup ? "/setup/name" : "/settings"} /><div className="grow" /></div>
+      <div className="top"><BackLink href={parentSignup ? "/signup/parent/name" : "/settings"} /><div className="grow" /></div>
       <p className="hello">Parent or guardian</p>
       <h1 className="h-xl">Link your child</h1>
       <p className="lead">Ask your child for the 6-digit code in their Nyansa settings.</p>

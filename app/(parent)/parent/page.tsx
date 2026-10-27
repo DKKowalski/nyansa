@@ -4,7 +4,9 @@ import { I } from "@/components/icons";
 import { Avatar } from "@/components/shells";
 import { useToast } from "@/components/toast";
 import { Gauge, StatRow } from "@/components/viz";
+import Link from "next/link";
 import { CORE } from "@/lib/content";
+import { useApp } from "@/lib/store";
 import { BusyButton, Num } from "@/components/motion";
 
 const ENC = ["Well done, Ama!", "Keep going!", "I'm proud of you", "Remember your study time today"];
@@ -14,6 +16,7 @@ const GRADES = ["Grade 5", "Grade 4", "Not started", "Not started"], PCTS = [45,
 export default function ParentHome() {
   const toast = useToast();
   const [enc, setEnc] = useState<string | null>(null);
+  const kids = useApp((s) => s.kids);
   return (
     <div className="scr">
       <div className="top m-only"><Avatar parent /><div className="grow" /><button type="button" className="cbtn" aria-label="Notifications" onClick={() => toast("No new messages")}><I.bell /></button></div>
@@ -26,6 +29,18 @@ export default function ParentHome() {
             <div className="stat bg-sage"><div className="tp">Days active</div><div className="v"><b>5</b><span>of 7</span></div></div>
             <div className="stat bg-butter"><div className="tp">Maths grade</div><div className="v"><b>4</b><span>was 5</span></div></div>
           </div>
+          {kids.length > 0 && (
+            <div className="gcard" style={{ padding: "12px 20px" }}>
+              <div className="hd" style={{ margin: "4px 0" }}><b>Your children</b><Link className="linkbtn" href="/signup/parent/child">+ Add a child</Link></div>
+              {kids.map((k) => (
+                <div key={k.user} className="kidcard">
+                  <span className="av2">{k.av}</span>
+                  <span className="tx"><b>{k.name} · {k.cls}</b><span>Username: {k.user}</span></span>
+                  <button type="button" className="btn light" style={{ width: "auto", padding: "9px 12px", fontSize: 14 }} onClick={() => toast(`A new password for ${k.name} was sent to your phone`)}>Reset password</button>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="gcard">
             <b style={{ fontWeight: 500, fontSize: 18 }}>Send Ama some encouragement</b>
             <div className="enc" style={{ marginTop: 10 }}>{ENC.map((m) => <button key={m} type="button" aria-pressed={enc === m} onClick={() => setEnc(m)}>{m}</button>)}</div>

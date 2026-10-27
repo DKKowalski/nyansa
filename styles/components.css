@@ -546,3 +546,38 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outl
 .chatfoot .helps button { flex: none; }
 @container (min-width: 900px) { .chatfoot .helps { flex-wrap: wrap; margin-inline: 0; padding-inline: 0; } }
 .hero :is(a, button).restart { background: transparent; color: #BFD9CB; padding: 6px; font-size: 15px; font-weight: 400; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ===== accounts: consent, password, level, birth date, login card ===== */
+.agree { display: flex; gap: 12px; align-items: flex-start; background: var(--white); border-radius: 20px; padding: 14px 16px; cursor: pointer; font-size: 15px; line-height: 1.45; color: var(--ink-2); position: relative; }
+.agree input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.agree .box { width: 26px; height: 26px; border-radius: 8px; border: 2px solid rgba(20,24,22,.3); display: grid; place-items: center; flex: none; color: transparent; transition: background .15s var(--ease-out, ease), border-color .15s; }
+.agree .box svg { width: 16px; height: 16px; }
+.agree input:checked + .box { background: var(--forest); border-color: var(--forest); color: #fff; }
+.agree input:focus-visible + .box { outline: 3px solid var(--gold); outline-offset: 2px; }
+.agree b { color: var(--ink); font-weight: 500; }
+.pwfield { position: relative; }
+.pwfield .input { padding-right: 84px; }
+.pwshow { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font: inherit; font-size: 14.5px; border: 0; border-radius: 999px; padding: 8px 12px; background: var(--ground); color: var(--ink); cursor: pointer; }
+.dob { display: grid; grid-template-columns: 1fr 1.6fr 1.2fr; gap: 8px; }
+.dob .input { padding: 17px 14px; }
+select.input { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink-2) 50%), linear-gradient(135deg, var(--ink-2) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 32px; }
+.agebadge { justify-self: start; border-radius: 999px; padding: 6px 12px; font-size: 14px; background: var(--sage); }
+.agebadge.minor { background: var(--butter); }
+.levelgrid .pcard { min-height: 150px; padding-bottom: 76px; }
+@container (min-width: 900px) { .levelgrid { grid-template-columns: repeat(4, 1fr); } .levelgrid .pcard { min-height: 230px; } }
+.sugs { display: flex; gap: 8px; flex-wrap: wrap; }
+.bg-forest { background: var(--forest-deep); color: #fff; }
+.logincard { gap: 14px !important; }
+.lc-row { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.1); border-radius: 18px; padding: 12px 16px; }
+.lc-row span { color: #BFD9CB; font-size: 14px; width: 80px; }
+.lc-row b { flex: 1; font-size: 20px; font-weight: 500; letter-spacing: .02em; min-width: 0; overflow-wrap: anywhere; }
+.kidcard { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+.kidcard:last-child { border: 0; }
+.kidcard .av2 { width: 48px; height: 48px; border-radius: 50%; background: var(--sage); display: grid; place-items: center; font-size: 24px; flex: none; }
+.kidcard .tx { flex: 1; display: grid; }
+.kidcard .tx b { font-weight: 500; }
+.kidcard .tx span { font-size: 13.5px; color: var(--muted); }
+.legal { display: grid; gap: 12px; }
+.legal h2 { margin: 10px 0 0; font-weight: 500; font-size: 21px; }
+.legal p, .legal li { margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2); font-weight: 300; }
+.legal ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }

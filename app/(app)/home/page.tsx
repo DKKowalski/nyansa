@@ -25,6 +25,15 @@ export default function Home() {
         <div style={{ flex: 1 }}><p className="hello">{greeting(s.now)},</p><h1 className="h-xl" style={{ marginTop: 8 }}>{firstName(s.name)}</h1></div>
         <div className="streak"><span style={{ color: "var(--clay)", gridRow: "span 2" }}><I.flame width={22} height={22} /></span><b>1</b><span>Day</span></div>
       </div>
+      {s.approval === "pending" && (
+        <div className="pcard bg-butter" style={{ cursor: "default", padding: "14px 18px" }}>
+          <span className="k">Waiting for {s.guardian?.name.split(/\s+/)[0] || "your parent"} to approve your account. We sent them a link; they have 7 days.</span>
+          <span style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <button type="button" className="linkbtn" onClick={() => toast("Link sent again")}>Send the link again</button>
+            <Link className="linkbtn" href="/approve">Prototype: open the parent&apos;s link</Link>
+          </span>
+        </div>
+      )}
       <div className="cols">
         <div className="col">
           <div className="hero">

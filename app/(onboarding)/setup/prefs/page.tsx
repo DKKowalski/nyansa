@@ -15,7 +15,7 @@ export default function Prefs() {
   const router = useRouter();
   return (
     <div className="scr">
-      <SetupTop step="prefs" />
+      <SetupTop />
       <p className="hello">Almost done</p>
       <h1 className="h-xl">Data and language</h1>
       <div className="cols obc">

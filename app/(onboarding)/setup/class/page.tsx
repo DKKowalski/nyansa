@@ -1,38 +1,41 @@
 "use client";
 import { I } from "@/components/icons";
-import { CtaLink } from "@/components/ui";
-import { SetupTop } from "@/components/shells";
+import { SetupTop, useNextStep } from "@/components/shells";
 import { examDate, examName, useApp } from "@/lib/store";
 
 const PRIVATE = "Private candidate";
 
-/** A3 Choose class (JHS/SHS year or private candidate). */
+/** A3 Choose class: Primary 4 to 6, a JHS or SHS year, or private candidate. */
 export default function Class() {
+  const next = useNextStep();
   const s = useApp();
-  const { cls, exam, set } = s;
+  const { cls, exam, level, set } = s;
+  const primary = level === "primary";
   const lv = exam === "WASSCE" ? "SHS" : "JHS";
+  const classes = primary ? [4, 5, 6].map((n) => `Primary ${n}`) : [1, 2, 3].map((n) => `${lv} ${n}`);
   const exs = new Date(examDate(s) + "T00:00").toLocaleDateString("en-GB", { month: "long", year: "numeric" });
-  const yearsLeft = cls === PRIVATE ? 0 : cls ? 3 - Number(cls.slice(-1)) : null;
+  // Primary 6 → JHS 1 → … → BECE at the end of JHS 3.
+  const yearsLeft = cls === PRIVATE ? 0 : cls ? (cls.startsWith("Primary") ? 9 : 3) - Number(cls.slice(-1)) : null;
   return (
     <div className="scr">
-      <SetupTop step="class" />
+      <SetupTop />
       <div className="cols obc">
         <div className="col">
           <p className="hello">{examName(exam)}</p>
           <h1 className="h-xl">Which class are you in?</h1>
-          <p className="lead">So we match the syllabus to where you are.</p>
+          <p className="lead">{primary ? "We'll build the foundations you need for JHS and the BECE." : "So we match the syllabus to where you are."}</p>
           <div className="chips" style={{ flexWrap: "wrap" }}>
-            {[1, 2, 3].map((n) => `${lv} ${n}`).map((c) => (
+            {classes.map((c) => (
               <button key={c} type="button" className="chip" style={{ fontSize: 18, padding: "16px 26px" }} aria-pressed={cls === c} onClick={() => set({ cls: c })}>{c}</button>
             ))}
           </div>
-          <button type="button" className="prow bg-white" aria-pressed={cls === PRIVATE} onClick={() => set({ cls: PRIVATE })}
+          {!primary && <button type="button" className="prow bg-white" aria-pressed={cls === PRIVATE} onClick={() => set({ cls: PRIVATE })}
             style={{ opacity: 1, boxShadow: cls === PRIVATE ? "inset 0 0 0 2.5px var(--ink)" : undefined }}>
             <span className="ico bg-butter"><I.person /></span>
             <span className="tx"><b>Private candidate</b><span>Re-sitting or studying outside school</span></span>
             <span className="end"><I.arrow /></span>
-          </button>
-          {cls?.endsWith("3") && (
+          </button>}
+          {!primary && cls?.endsWith("3") && (
             <div className="pcard bg-butter m-only" style={{ cursor: "default", padding: "14px 18px" }}>
               <span className="k">You&apos;re writing the {examName(exam)} this year. We&apos;ll focus your plan on exam topics first.</span>
             </div>
@@ -51,7 +54,7 @@ export default function Class() {
         </div>
       </div>
       <div className="cta">
-        <CtaLink href="/setup/subjects" ready={!!cls}>Continue</CtaLink>
+        <button type="button" className="btn" disabled={!cls} onClick={() => next()}>Continue</button>
       </div>
     </div>
   );
